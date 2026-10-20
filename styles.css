@@ -47,3 +47,15 @@
 /* Controles de volumen de música y efectos */
 .volume-control{display:flex;align-items:center;gap:12px;margin-top:11px;max-width:420px}.volume-control input[type="range"]{width:100%;min-width:70px;accent-color:#55d4c3;cursor:pointer}.volume-control output{min-width:42px;text-align:right;color:#8cf3df;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}.setting-row .setting-copy{flex:1}.setting-row:has(.volume-control){align-items:center}.setting-row:has(.volume-control) .setting-copy{max-width:620px}
 @media(max-width:560px){.setting-row:has(.volume-control){align-items:flex-start;flex-wrap:wrap}.setting-row:has(.volume-control) .setting-copy{width:calc(100% - 55px);flex:1 1 calc(100% - 55px)}.setting-row:has(.volume-control) .toggle{margin-left:49px}.volume-control{max-width:100%}}
+/* Bodega consultable durante una expedición: pausa sin permitir ventas. */
+.fishing-screen.hold-open>.expedition-hold-panel{display:block!important;max-width:820px;margin:0 auto;width:100%;}
+.fishing-screen.hold-open>:not(.expedition-hold-panel){display:none!important}
+.expedition-hold-panel{padding:22px 0 34px;min-height:55vh}
+.expedition-hold-panel .page-heading{margin-bottom:20px}
+.expedition-hold-panel .page-heading h1{font-size:clamp(27px,4vw,38px)}
+.expedition-hold-panel .wallet-panel{margin-bottom:15px}
+.expedition-hold-panel .list-panel{margin-bottom:18px;max-height:48vh;overflow:auto}
+.expedition-hold-panel>.primary{display:block;margin:18px auto 0;min-width:min(100%,300px)}
+#open-expedition-hold{font-size:11px;white-space:nowrap;flex-shrink:0}
+#expedition-hold-count{color:var(--gold);margin-left:4px}
+@media(max-width:760px){.expedition-hold-panel{padding-top:16px}.expedition-hold-panel .wallet-panel{gap:10px}.expedition-hold-panel .wallet-panel>div{flex:1}}
