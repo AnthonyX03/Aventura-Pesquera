@@ -95,3 +95,15 @@
 .aquarium-choice>small{display:block;margin-top:8px;color:var(--muted);font-size:10px}
 .tank-fish strong{font-size:9px;color:#ffe59b}
 @media(max-width:700px){.aquarium-upgrade-list{grid-template-columns:1fr}.aquarium-upgrade-card{align-items:flex-start}.aquarium-upgrade-card button{align-self:center}}
+
+/* Corrección de integración: mejoras del acuario viven en el árbol general. */
+.aquarium-skill-panel{display:none!important}
+.aquarium-upgrades-in-tree{margin-top:28px;padding:22px;border:1px solid #2c6977;border-radius:16px;background:linear-gradient(135deg,#10394b,#0a2437)}
+.aquarium-upgrades-in-tree h2{margin:4px 0 8px;font-size:22px}
+.aquarium-upgrades-in-tree>p:not(.eyebrow){color:var(--muted);font-size:13px;line-height:1.6}
+.aquarium-upgrades-in-tree .aquarium-upgrade-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}
+.aquarium-tank{display:flex;align-items:center;justify-content:space-around;flex-wrap:wrap;gap:12px;min-height:245px;padding:26px 14px 34px}
+.tank-fish{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:clamp(110px,18%,170px);min-height:125px;padding:12px 8px;border:1px solid #ffffff45;border-radius:15px;background:#073c5b70;color:#f4fcff;cursor:pointer;animation:fish-drift 3.5s ease-in-out infinite;backdrop-filter:blur(2px)}
+.tank-fish:nth-child(even){animation-delay:-1.7s}.tank-fish>span{font-size:clamp(32px,5vw,50px);filter:drop-shadow(0 3px 3px #00334855)}.tank-fish small{font-size:11px;font-weight:800;text-align:center}.tank-fish strong{font-size:10px;color:#ffe08a}.tank-fish em{font-size:10px;color:#b8f5f3;font-style:normal;opacity:.85}.tank-fish:hover{transform:translateY(-3px);border-color:#a7f3ed}.tank-empty{position:relative;z-index:1;display:flex;align-items:center;flex-direction:column;gap:10px;color:#e1fbff;text-align:center}.tank-empty>span:first-child{font-size:46px}.aquarium-income-footer{border-top:1px solid #ffffff17}.aquarium-income-footer strong{font-size:22px}.aquarium-choice>strong{display:block;margin:8px 0;color:#ffe08a;font-size:12px!important;line-height:1.4}
+@keyframes fish-drift{0%,100%{translate:0 0}50%{translate:8px -7px}}
+@media(max-width:700px){.aquarium-upgrades-in-tree .aquarium-upgrade-list{grid-template-columns:1fr}.tank-fish{width:42%;min-height:100px}.aquarium-tank{min-height:200px}}
