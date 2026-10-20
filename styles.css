@@ -114,3 +114,13 @@
 .tank-fish:nth-child(1){left:9%;top:22%}.tank-fish:nth-child(2){left:37%;top:57%}.tank-fish:nth-child(3){left:69%;top:19%}.tank-fish:nth-child(4){left:52%;top:30%}.tank-fish:nth-child(5){left:19%;top:65%}.tank-fish:nth-child(6){left:81%;top:58%}.tank-fish:nth-child(n+7){left:calc(8% + (var(--fish-index, 1)*11%));top:calc(15% + (var(--fish-index, 1)*7%))}.tank-fish:hover{scale:1.18;filter:drop-shadow(0 0 10px #c9ffff)}
 @keyframes fish-swim{0%,100%{transform:translate(0,0) rotate(-3deg)}20%{transform:translate(20px,-10px) rotate(2deg)}45%{transform:translate(36px,8px) rotate(0)}65%{transform:translate(12px,16px) rotate(-2deg)}82%{transform:translate(-12px,3px) rotate(2deg)}}
 .relic-encyclopedia{margin:24px 0;padding-top:14px;border-top:1px solid #ffffff18}.relic-encyclopedia h2{font-size:20px}.relic-storage-tree{margin-top:22px}
+/* v1.8: ramas de acuario y tesoros en el mismo árbol de cuadrados */
+.skill-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px}
+.skill-tab{min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 7px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text,#eaf6ff)}
+.skill-tab.active{border-color:#38cdb7;background:#10404c;box-shadow:inset 0 0 0 1px #38cdb744}
+.skill-tab span{font-size:24px}.skill-tab b{font-size:12px}.skill-tab small{font-size:10px;color:var(--muted)}
+.treasure-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:16px 0 28px}
+.treasure-slot{min-width:0;min-height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:12px 8px;border:1px solid #31566b;border-radius:14px;background:linear-gradient(145deg,#102f43,#0a2032)}
+.treasure-slot.filled{border-color:#4dbba9;background:linear-gradient(145deg,#10413f,#0a2835)}.treasure-slot.locked{opacity:.72;border-style:dashed}
+.treasure-slot b{font-size:12px}.treasure-slot small{font-size:10px;line-height:1.4;color:var(--muted)}.treasure-slot-emoji{display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:12px;background:#ffffff0c;color:inherit;font-size:30px}
+@media(max-width:760px){.skill-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}.treasure-slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
