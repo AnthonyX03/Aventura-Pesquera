@@ -1,0 +1,17 @@
+{
+  "id": "./index.html",
+  "name": "Aventura Pesquera",
+  "short_name": "Pesquera",
+  "description": "Pesca, descubre especies y explora diez zonas marinas.",
+  "lang": "es-ES",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#071b2d",
+  "theme_color": "#071b2d",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {"src":"assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
