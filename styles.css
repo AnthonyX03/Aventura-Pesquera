@@ -176,3 +176,8 @@
 .bait-details{margin:.75rem 0;padding:.75rem 1rem;border-radius:12px;border:1px solid var(--line);background:var(--panel)}
 .bait-details summary{cursor:pointer;font-weight:750}
 kbd{background:#123;border:1px solid #456;border-radius:4px;padding:0 .35rem}
+
+.weather-badge-btn{cursor:pointer;user-select:none;transition:transform .15s,box-shadow .15s}
+.weather-badge-btn:hover,.weather-badge-btn:focus{transform:translateY(-1px);box-shadow:0 0 0 2px #4d9aab88;outline:none}
+.expedition-event{margin:.65rem 0 0;padding:.55rem .75rem;border-radius:10px;background:linear-gradient(135deg,#3b1d6e99,#1a4a5899);border:1px solid #a78bfa55;color:#f3e8ff;font-size:.88rem;font-weight:650;line-height:1.35}
+.menu-hero .hero-text .primary.big,.menu-hero .hero-text .secondary.big{display:inline-flex;margin-right:.4rem}
