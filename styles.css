@@ -135,3 +135,8 @@
 /* v26: un único acceso visible y una salida clara, integrados con el estilo del puerto */
 .treasure-encyclopedia-open{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:360px;margin:18px 0 24px;padding:13px 18px;border:1px solid #b9944d;border-radius:10px;background:linear-gradient(135deg,#73552b,#4a3925);color:#fff1c9;font-weight:800;box-shadow:0 4px 14px #0003}.treasure-encyclopedia-open:hover{filter:brightness(1.12);transform:translateY(-1px)}.treasure-encyclopedia-exit{display:inline-flex;align-items:center;gap:8px;margin:4px 0 16px;padding:10px 14px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);font-weight:750}.treasure-encyclopedia-exit:hover{border-color:#4d9aab;background:#123747}
 @media(max-width:650px){.treasure-encyclopedia-open{max-width:none}.treasure-encyclopedia-exit{width:100%;justify-content:center}}
+
+.section-title{margin:1.25rem 0 .65rem;font-size:1.05rem;font-weight:800;color:var(--text)}
+.hold-actions{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.35rem}
+.hold-actions button{flex:1;min-width:5.5rem;font-size:.78rem;padding:.35rem .5rem}
+.muted{opacity:.75;font-size:.88rem}
