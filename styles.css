@@ -242,3 +242,41 @@ kbd{background:#123;border:1px solid #456;border-radius:4px;padding:0 .35rem}
 .gacha-r5 #gacha-anim-rarity{color:#fb7185}
 .gacha-r4 #gacha-anim-rarity{color:#fbbf24}
 .gacha-r3 #gacha-anim-rarity{color:#c084fc}
+
+
+/* —— Gachapón decorado —— */
+.gacha-stage{margin-top:.35rem}
+.gacha-hero{border-radius:22px;overflow:hidden;border:1px solid #3d6a82;background:#081828;box-shadow:0 16px 50px #0007,inset 0 0 80px #1e90ff18}
+.gacha-hero-banner{height:clamp(140px,28vw,220px);background-size:cover;background-position:center top;background-repeat:no-repeat;position:relative}
+.gacha-hero-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,#081828cc 72%,#081828 100%)}
+.gacha-hero-body{padding:0 1.15rem 1.35rem;margin-top:-28px;position:relative;z-index:1;text-align:center}
+.gacha-kicker{display:inline-block;margin:0 0 .35rem;padding:.2rem .7rem;border-radius:999px;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:#1e3a5f;color:#7dd3fc;border:1px solid #3b82f655}
+.gacha-hero-body h2{margin:.15rem 0 .4rem;font-size:clamp(1.35rem,4vw,1.85rem);letter-spacing:-.02em;background:linear-gradient(180deg,#fff 20%,#fde68a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #0006)}
+.event-machine .gacha-hero-body h2{background:linear-gradient(180deg,#fff,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent}
+.treasure-machine .gacha-hero-body h2{background:linear-gradient(180deg,#fff7d6,#f59e0b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gacha-lead{margin:0 auto .85rem;max-width:36ch;color:#b6d0e0;font-size:.92rem;line-height:1.45}
+.gacha-rarity-row{display:flex;flex-wrap:wrap;justify-content:center;gap:.35rem;margin-bottom:.35rem}
+.gacha-rarity-row .gr{padding:.22rem .55rem;border-radius:999px;font-size:.68rem;font-weight:800;border:1px solid transparent}
+.gr0{background:#334155;color:#e2e8f0}.gr1{background:#14532d;color:#bbf7d0}.gr2{background:#1e3a8a;color:#bfdbfe}
+.gr3{background:#581c87;color:#e9d5ff}.gr4{background:#854d0e;color:#fde68a}.gr5{background:#9d174d;color:#fbcfe8}
+.gacha-rates-bar{display:flex;justify-content:center;gap:.45rem;flex-wrap:wrap;margin-bottom:.85rem;font-size:.65rem;color:#7a9bb0}
+.gacha-globe{display:flex;justify-content:center;gap:.35rem;margin:.5rem auto .85rem;padding:.65rem 1rem;max-width:280px;border-radius:50%;aspect-ratio:1.6;align-items:center;background:radial-gradient(circle at 50% 40%,#38bdf833,#0c4a6e55 55%,#082f49 100%);border:3px solid #fbbf2466;box-shadow:0 0 30px #38bdf844,inset 0 0 24px #fff1;animation:gachaFloat 3s ease-in-out infinite}
+.gacha-globe span{font-size:1.45rem;animation:gachaBob 2s ease-in-out infinite}
+.gacha-globe span:nth-child(2){animation-delay:.2s}.gacha-globe span:nth-child(3){animation-delay:.4s}
+.gacha-globe span:nth-child(4){animation-delay:.6s}.gacha-globe span:nth-child(5){animation-delay:.8s}
+.gacha-globe.event{border-color:#c084fc88;background:radial-gradient(circle at 50% 40%,#a78bfa44,#4c1d9588 60%,#1e1b4b)}
+.gacha-globe.treasure{border-color:#fbbf24aa;background:radial-gradient(circle at 50% 40%,#fde68a33,#92400e66 60%,#1c1917)}
+@keyframes gachaBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.gacha-ticket-pill{display:inline-block;margin-bottom:.75rem;padding:.45rem 1rem;border-radius:999px;font-weight:800;background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid #fbbf2455;color:#fde68a;box-shadow:0 4px 16px #0005}
+.gacha-cta{display:inline-flex;align-items:center;justify-content:center;min-width:min(100%,280px);padding:.95rem 1.5rem;border:0;border-radius:999px;font-size:1.05rem;font-weight:900;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;color:#1a1205;background:linear-gradient(180deg,#fde68a,#f59e0b);box-shadow:0 6px 0 #b45309,0 12px 28px #f59e0b55;transition:transform .12s,filter .12s}
+.gacha-cta:hover{filter:brightness(1.06)}
+.gacha-cta:active{transform:translateY(3px);box-shadow:0 3px 0 #b45309,0 8px 18px #f59e0b44}
+.gacha-cta:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.3);box-shadow:0 4px 0 #444}
+.gacha-cta.event{background:linear-gradient(180deg,#e9d5ff,#a855f7);color:#2e1065;box-shadow:0 6px 0 #6b21a8,0 12px 28px #a855f755}
+.gacha-cta.treasure{background:linear-gradient(180deg,#fef3c7,#d97706);color:#451a03;box-shadow:0 6px 0 #92400e,0 12px 28px #d9770655}
+.gacha-footnote{margin:.65rem 0 0;font-size:.78rem;color:#7a9bb0}
+@media(max-width:640px){
+  .gacha-hero-banner{height:120px}
+  .gacha-globe{max-width:200px;padding:.4rem}
+  .gacha-globe span{font-size:1.15rem}
+}

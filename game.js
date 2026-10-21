@@ -964,17 +964,61 @@ function renderGacha(){
  const root=$('gacha-list');if(!root)return;
  const tab=window._gachaTab||'fish';
  document.querySelectorAll('[data-gacha-tab]').forEach(b=>b.classList.toggle('active',b.dataset.gachaTab===tab));
- const rates=`<div class="gacha-rates"><b>Probabilidades</b><span>Común 55%</span><span>Poco común 27%</span><span>Raro 12%</span><span>Épico 4.5%</span><span>Legendario 1.2%</span><span>Mítico 0.3%</span></div>`;
  const tickets=state.gachaTickets||{fish:0,event:0,treasure:0};
+ const rarityRow=`<div class="gacha-rarity-row">
+  <span class="gr gr0">Común</span><span class="gr gr1">Poco común</span><span class="gr gr2">Raro</span>
+  <span class="gr gr3">Épico</span><span class="gr gr4">Legendario</span><span class="gr gr5">Mítico</span>
+ </div>`;
+ const rates=`<div class="gacha-rates-bar"><span>55%</span><span>27%</span><span>12%</span><span>4.5%</span><span>1.2%</span><span>0.3%</span></div>`;
+
  if(tab==='fish'){
   const nZones=(state.unlocked||[]).length;
-  root.innerHTML=`${rates}<article class="gacha-machine fish-machine"><div class="gacha-machine-art">🐟🎰</div><h2>Gachapón del puerto</h2><p>Peces de las <b>${nZones}</b> zonas que has desbloqueado. Van al almacén.</p><div class="gacha-ticket-count">🎟️ ${tickets.fish||0} fichas</div><button class="primary big" data-open-gacha="fish" ${(tickets.fish||0)<1?'disabled':''}>Girar (1 ficha)</button></article>`;
+  const n=tickets.fish||0;
+  root.innerHTML=`<article class="gacha-hero fish-machine">
+   <div class="gacha-hero-banner" style="background-image:url('./assets/gacha-fish.jpg')" role="img" aria-label="Gachapón de peces"></div>
+   <div class="gacha-hero-body">
+    <p class="gacha-kicker">OCEAN TREASURES GACHA</p>
+    <h2>¡Gachapón de peces!</h2>
+    <p class="gacha-lead">Gira y colecciona peces raros de tus <b>${nZones}</b> zonas desbloqueadas. Van al almacén.</p>
+    ${rarityRow}${rates}
+    <div class="gacha-globe" aria-hidden="true"><span>🐟</span><span>🐠</span><span>🐡</span><span>🦈</span><span>🦑</span></div>
+    <div class="gacha-ticket-pill">🎟️ ${n} ficha${n===1?'':'s'} de peces</div>
+    <button class="gacha-cta" data-open-gacha="fish" ${n<1?'disabled':''}>¡GIRA AHORA!</button>
+    <p class="gacha-footnote">1 ficha por giro · Cuantas más zonas, más especies posibles</p>
+   </div>
+  </article>`;
  } else if(tab==='event'){
   const ids=unlockedEventZoneIds();
-  root.innerHTML=`${rates}<article class="gacha-machine event-machine"><div class="gacha-machine-art">🎉🎰</div><h2>Gachapón de evento</h2><p>Peces exclusivos de zonas de evento (${ids.length} desbloqueadas). Se abren al progresar en el mapa.</p><div class="gacha-ticket-count">🎟️ ${tickets.event||0} fichas de evento</div><button class="primary big" data-open-gacha="event" ${(tickets.event||0)<1||!ids.length?'disabled':''}>Girar evento</button></article>`;
+  const n=tickets.event||0;
+  root.innerHTML=`<article class="gacha-hero event-machine">
+   <div class="gacha-hero-banner" style="background-image:url('./assets/gacha-event.jpg')" role="img" aria-label="Gachapón de evento"></div>
+   <div class="gacha-hero-body">
+    <p class="gacha-kicker">EVENTO LIMITADO</p>
+    <h2>¡Gachapón de evento!</h2>
+    <p class="gacha-lead">Peces exclusivos de zonas de evento (<b>${ids.length}</b> desbloqueadas). Se abren al progresar en el mapa.</p>
+    ${rarityRow}${rates}
+    <div class="gacha-globe event" aria-hidden="true"><span>🎉</span><span>💎</span><span>🌑</span><span>👻</span><span>🌀</span></div>
+    <div class="gacha-ticket-pill">🎟️ ${n} ficha${n===1?'':'s'} de evento</div>
+    <button class="gacha-cta event" data-open-gacha="event" ${n<1||!ids.length?'disabled':''}>¡GIRA EVENTO!</button>
+    <p class="gacha-footnote">${ids.length? 'Pool activa según tus zonas de evento':'Desbloquea zonas de evento en el mapa para girar'}</p>
+   </div>
+  </article>`;
  } else {
   const maxZ=Math.max(0,...(state.unlocked||[0]));
-  root.innerHTML=`${rates}<article class="gacha-machine treasure-machine"><div class="gacha-machine-art">🗝️🎰</div><h2>Gachapón de tesoros</h2><p>Reliquias según tu progreso (hasta zona ${maxZ+1}). Van a tu colección de tesoros.</p><div class="gacha-ticket-count">🎟️ ${tickets.treasure||0} fichas de tesoro</div><button class="primary big" data-open-gacha="treasure" ${(tickets.treasure||0)<1?'disabled':''}>Girar tesoro</button></article>`;
+  const n=tickets.treasure||0;
+  root.innerHTML=`<article class="gacha-hero treasure-machine">
+   <div class="gacha-hero-banner" style="background-image:url('./assets/gacha-treasure.jpg')" role="img" aria-label="Gachapón de tesoros"></div>
+   <div class="gacha-hero-body">
+    <p class="gacha-kicker">RELIQUIAS DEL MAR</p>
+    <h2>¡Gachapón de tesoros!</h2>
+    <p class="gacha-lead">Reliquias según tu progreso (hasta zona <b>${maxZ+1}</b>). Van a tu colección de tesoros.</p>
+    ${rarityRow}${rates}
+    <div class="gacha-globe treasure" aria-hidden="true"><span>🗝️</span><span>👑</span><span>💎</span><span>🧭</span><span>🪙</span></div>
+    <div class="gacha-ticket-pill">🎟️ ${n} ficha${n===1?'':'s'} de tesoro</div>
+    <button class="gacha-cta treasure" data-open-gacha="treasure" ${n<1?'disabled':''}>¡GIRA TESORO!</button>
+    <p class="gacha-footnote">Más zonas desbloqueadas = mejores reliquias posibles</p>
+   </div>
+  </article>`;
  }
 }
 
