@@ -1,4 +1,4 @@
-const CACHE='aventura-pesquera-v32-tesoros-habilidades';
+const CACHE='aventura-pesquera-v34-habilidades-tesoros';
 const ASSETS=['./','./index.html','./styles.css','./game.js','./manifest.webmanifest','./assets/icon.svg','./audio/AventuraPesquera.mp3'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))));self.clients.claim()});
