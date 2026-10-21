@@ -1,6 +1,6 @@
 (() => {
 'use strict';
-const $=id=>document.getElementById(id), screens=['intro','menu','fishing','zones','upgrades','encyclopedia','hold','settings','boat','treasures','aquarium','missions'];
+const $=id=>document.getElementById(id), screens=['intro','menu','fishing','zones','upgrades','encyclopedia','hold','settings','boat','treasures','aquarium','missions','achievements','gacha','stats'];
 const zones=[
 {name:'Costa tranquila',emoji:'🏝️',desc:'Aguas poco profundas, ideales para empezar.',price:0,depth:'0–30 m',color:['#a0e7df','#1c91a8'],pool:[0,1,2,3,4,5,6,7,8,9,10,11],bonus:1},
 {name:'Bahía de coral',emoji:'🪸',desc:'Arrecifes coloridos llenos de especies curiosas.',price:1800,depth:'20–90 m',color:['#9de1d0','#177d9b'],pool:[4,5,14,15,16,17,18,19,20,34,44,50],bonus:1.3},
@@ -11,7 +11,8 @@ const zones=[
 {name:'Fosa abisal',emoji:'🌑',desc:'Oscuridad profunda y criaturas extraordinarias.',price:720000,depth:'300–700 m',color:['#4989a5','#071f4d'],pool:[29,30,37,38,48,54,55,56,57,58],bonus:6.5},
 {name:'Cementerio de barcos',emoji:'⚓',desc:'Restos antiguos esconden especies casi olvidadas.',price:1900000,depth:'80–500 m',color:['#83b5ba','#123c62'],pool:[21,27,28,36,37,38,42,48,52,54,55,56,57],bonus:9},
 {name:'Mar de las estrellas',emoji:'✨',desc:'Un océano luminoso donde aparecen peces legendarios.',price:5200000,depth:'200–800 m',color:['#9cbbe9','#342b79'],pool:[29,30,37,38,39,48,54,55,56,57,58,59],bonus:13},
-{name:'Reino de Leviatán',emoji:'🐉',desc:'El límite del mundo conocido. Solo para capitanes expertos.',price:14000000,depth:'500–900 m',color:['#c1b0e9','#201748'],pool:[37,38,54,55,56,57,58,59],bonus:20}
+{name:'Reino de Leviatán',emoji:'🐉',desc:'El límite del mundo conocido. Solo para capitanes expertos.',price:14000000,depth:'500–900 m',color:['#c1b0e9','#201748'],pool:[37,38,54,55,56,57,58,59],bonus:20},
+{name:'Zona Secreta',emoji:'🌀',desc:'Un pliegue del océano solo visible con el Portal secreto y el logro Explorador.',price:0,depth:'??? m',color:['#1a0a2e','#4c1d95'],pool:[54,55,56,57,58,59,37,38],bonus:25,secret:true}
 ];
 const baseFish=[
 ['Sardina','🐟',8,0],['Boquerón','🐟',9,0],['Caballa','🐟',14,0],['Jurel','🐟',13,0],['Dorada','🐠',22,1],['Lubina','🐟',29,1],['Salmonete','🐟',18,0],['Trucha','🐟',20,1],['Carpa','🐟',17,0],['Atún','🐟',55,2],['Salmón','🐟',42,1],['Bacalao','🐟',38,1],['Pez espada','🐠',90,2],['Mero','🐠',48,1],['Rodaballo','🐟',45,1],['Pez globo','🐡',36,1],['Pez payaso','🐠',42,1],['Pez león','🐠',57,2],['Pez ángel','🐠',50,1],['Pez mariposa','🐠',40,1],['Pez loro','🐠',46,1],['Barracuda','🐟',70,2],['Tiburón azul','🦈',130,3],['Tiburón martillo','🦈',210,3],['Gran tiburón blanco','🦈',320,4],['Raya','🐟',55,1],['Mantarraya','🐟',145,3],['Anguila','🐍',47,1],['Morena','🐍',62,2],['Pez linterna','🐠',75,2],['Pez abisal','🐟',95,2],['Calamar','🦑',40,1],['Pulpo','🐙',56,1],['Sepia','🦑',36,0],['Caballito de mar','🐠',72,2],['Pez luna','🐟',95,2],['Pez remo','🐟',125,2],['Celacanto','🐟',260,4],['Pez dragón','🐉',190,3],['Pez cristal','🐠',120,3],['Piraña','🐟',45,1],['Arowana','🐟',150,3],['Esturión','🐟',88,2],['Pez koi','🐠',135,3],['Pez mandarín','🐠',105,2],['Pez unicornio','🐠',140,3],['Pez cofre','🐡',80,2],['Pez hacha','🐟',92,2],['Pez víbora','🐟',155,3],['Pez telescopio','🐠',115,2],['Pez disco','🐠',98,2],['Pez cirujano','🐠',84,2],['Pez zorro','🐟',160,3],['Pez vela','🐟',195,3],['Pez remo gigante','🐟',290,4],['Pez abisal fantasma','👻',390,4],['Pez cometa','🌠',470,4],['Dragón marino','🐉',680,5],['Pez de cristal lunar','💎',820,5],['Leviatán juvenil','🐲',1200,5],['Rey de las profundidades','👑',2500,5]
@@ -30,8 +31,123 @@ for(let i=0;i<1200;i++){
  const minZ=baseMinZone[bi],zoneBonus=zones[minZ].bonus;
  fish.push({id:i,name,emoji:i<baseFish.length?b[1]:['🐠','🐡','🦈','🐟','🦑','🐙','🐉','💎'][Math.floor(i/19)%8],value:Math.round(b[2]*(1+rarity*.55)*(1+(i%11)*.08)*zoneBonus),rarity,weight:Math.round((.4+((i*13)%80)/10)*10)/10,depth:10+((i*37)%880),speed:.45+((i*19)%20)/10,base:bi,minZone:minZ,zones:baseZoneNames[bi]});
 }
-const defaultState=()=>({money:150,day:1,zone:0,unlocked:[0],rod:1,boat:1,storageLevel:1,skillNodes:[],hold:[],discovered:[],sound:true,musicVolume:35,effectsVolume:70,hasStarted:false,totalCaught:0,totalSales:0,boatSkin:0,treasures:[],relics:[],equippedRelics:[],relicStorageLevel:5,relicUpgradeNodes:[],aquarium:[],aquariumLevel:1,aquariumUpgrades:[],completedMissions:[],tournamentClaimed:false,_contractsDone:0,warehouse:[],warehouseUpgrades:[],dailyMissions:[],dailyDate:'',dailyProgress:{},contracts:[],contractsDate:''});
-let state=loadState(),activeScreen='intro',timer=30,sessionActive=false,expeditionPausedForSettings=false,expeditionPausedForHold=false,cast=null,castCooldown=0,actors=[],lastFrame=0,raf=0,audioCtx=null,installPrompt=null,bookPage=0,treasureBookPage=0,aquariumPage=0,treasureView='equipment',toastTimeout=null;
+
+const WEATHERS=[
+{id:'calm',emoji:'☀️',name:'Mar en calma',desc:'Aguas tranquilas: más peces comunes.',rareMul:.72,commonMul:1.35,priceMul:1,treasureMul:1},
+{id:'storm',emoji:'⛈️',name:'Tormenta',desc:'El mar se agita: más rarezas y mejor botín.',rareMul:1.85,commonMul:.55,priceMul:1.22,treasureMul:1.35},
+{id:'fog',emoji:'🌫️',name:'Niebla densa',desc:'Visibilidad baja: más especies de profundidad.',rareMul:1.15,commonMul:.9,priceMul:1.08,treasureMul:1.1,depthBoost:true},
+{id:'wind',emoji:'🌬️',name:'Viento fuerte',desc:'Corrientes rápidas: peces velociosos más frecuentes.',rareMul:1.1,commonMul:1,priceMul:1.05,treasureMul:1.05,speedBoost:true}
+];
+const SEASONS=[
+{id:'spring',emoji:'🌸',name:'Primavera',desc:'Aguas productivas.',rareMul:1.05,priceMul:1.05},
+{id:'summer',emoji:'☀️',name:'Verano',desc:'Abundancia de peces comunes.',rareMul:.92,commonMul:1.2,priceMul:1},
+{id:'autumn',emoji:'🍂',name:'Otoño',desc:'Migraciones: más rarezas.',rareMul:1.2,priceMul:1.12},
+{id:'winter',emoji:'❄️',name:'Invierno',desc:'Aguas profundas y botín valioso.',rareMul:1.15,priceMul:1.18,depthBoost:true}
+];
+function weatherIndex(){return (state.day*7+state.zone*3)%WEATHERS.length}
+function seasonIndex(){return Math.floor((state.day-1)/7)%SEASONS.length}
+function currentWeather(){if(state.isNight)return {id:'night',emoji:'🌙',name:'Noche en el mar',desc:'Rarezas y profundidad aumentadas.',rareMul:1.45,commonMul:.65,priceMul:1.15,treasureMul:1.2,depthBoost:true};return WEATHERS[weatherIndex()]}
+function currentSeason(){return SEASONS[seasonIndex()]}
+const LIMITED_EVENTS=[
+{id:'shark_week',name:'Semana del tiburón',emoji:'🦈',desc:'Tiburones y depredadores más frecuentes. +30 % valor de ventas.',poolBoost:[22,23,24,21],rareMul:1.4,priceMul:1.3,days:7,startMod:0},
+{id:'treasure_tide',name:'Marea de tesoros',emoji:'🗝️',desc:'Más hallazgos en naufragios. +50 % tesoros.',poolBoost:[],rareMul:1,priceMul:1.1,treasureMul:1.5,days:5,startMod:11},
+{id:'crystal_night',name:'Noche de cristal',emoji:'💎',desc:'Especies luminosas y míticas aumentadas.',poolBoost:[39,55,56,57,58],rareMul:1.55,priceMul:1.25,days:6,startMod:23},
+{id:'coast_festival',name:'Festival costero',emoji:'🎉',desc:'Bonus de ventas en zonas iniciales.',poolBoost:[0,1,2,3,4,5],rareMul:.9,priceMul:1.35,days:4,startMod:35},
+{id:'abyssal_eclipse',name:'Eclipse abisal',emoji:'🌑',desc:'Criaturas de las profundidades y más míticos.',poolBoost:[29,30,37,38,54,55,56],rareMul:1.7,priceMul:1.4,days:5,startMod:47},
+{id:'tuna_migration',name:'Migración del atún',emoji:'🐟',desc:'Atunes y pelágicos en abundancia.',poolBoost:[9,10,12,21,52,53],rareMul:1.25,priceMul:1.2,days:6,startMod:59},
+{id:'ghost_fog',name:'Niebla fantasma',emoji:'👻',desc:'Especies espectrales y más tesoros.',poolBoost:[55,48,37,38,29],rareMul:1.45,priceMul:1.15,treasureMul:1.6,days:5,startMod:71},
+{id:'secret_gate',name:'Portal secreto',emoji:'🌀',desc:'Puede abrir la Zona Secreta si tienes el logro Explorador.',poolBoost:[57,58,59],rareMul:1.3,priceMul:1.2,days:3,startMod:83,secret:true}
+];
+function activeEvent(){
+ const day=state.day||1;
+ for(const ev of LIMITED_EVENTS){
+  const cycle=ev.days+10;
+  const pos=((day+ev.startMod-1)%cycle);
+  if(pos<ev.days)return {...ev,dayLeft:ev.days-pos};
+ }
+ return null;
+}
+const ACHIEVEMENTS=[
+{id:'first_catch',icon:'🎣',title:'Primera captura',desc:'Pesca tu primer pez.',check:()=>state.totalCaught>=1},
+{id:'catch_100',icon:'🐟',title:'Centena',desc:'Pesca 100 peces.',check:()=>state.totalCaught>=100},
+{id:'rich',icon:'💰',title:'Bolsa llena',desc:'Acumula 10.000 €.',check:()=>state.money>=10000},
+{id:'explorer',icon:'🗺️',title:'Explorador',desc:'Desbloquea 5 zonas.',check:()=> (state.unlocked||[]).length>=5},
+{id:'collector',icon:'📖',title:'Coleccionista',desc:'Descubre 50 especies.',check:()=>state.discovered.length>=50},
+{id:'mythic',icon:'🐉',title:'Mito vivo',desc:'Descubre un pez mítico.',check:()=>state.discovered.some(id=>fish[id]&&fish[id].rarity>=5)},
+{id:'treasure_hunter',icon:'🗝️',title:'Cazatesoros',desc:'Encuentra 5 tesoros.',check:()=>((state.treasures||[]).length+(state.relics||[]).length)>=5},
+{id:'captain',icon:'⛵',title:'Capitán',desc:'Compra un barco mejorado.',check:()=>(Number(state.boatSkin)||0)>=1},
+{id:'warehouse_pro',icon:'📦',title:'Logística',desc:'Amplía el almacén una vez.',check:()=>(state.warehouseUpgrades||[]).length>=1},
+{id:'contract_king',icon:'📋',title:'Contratista',desc:'Completa 10 contratos.',check:()=>(state._contractsDone||0)>=10},
+{id:'storm_survivor',icon:'⛈️',title:'Bajo la tormenta',desc:'Pesca durante una tormenta.',check:()=>!!state._caughtInStorm},
+{id:'event_goer',icon:'🎉',title:'Fiesta marina',desc:'Juega durante un evento limitado.',check:()=>!!state._playedEvent}
+];
+function unlockAchievement(id){
+ if(!state.achievements)state.achievements=[];
+ if(state.achievements.includes(id))return;
+ const a=ACHIEVEMENTS.find(x=>x.id===id);if(!a)return;
+ state.achievements.push(id);save();
+ toast(`🏅 Logro: ${a.title}`);
+ showMissionCompleteFx();
+}
+function checkAchievements(){
+ ACHIEVEMENTS.forEach(a=>{try{if(a.check())unlockAchievement(a.id)}catch(e){}});
+}
+function renderAchievements(){
+ const root=$('achievement-list');if(!root)return;
+ const got=new Set(state.achievements||[]);
+ root.innerHTML=ACHIEVEMENTS.map(a=>{
+  const unlocked=got.has(a.id);
+  return `<article class="feature-card ${unlocked?'feature-active':''}"><div class="feature-emoji">${unlocked?a.icon:'🔒'}</div><h3>${a.title}</h3><p>${a.desc}</p><small>${unlocked?'Desbloqueado':'Por conseguir'}</small></article>`;
+ }).join('');
+ const count=got.size;
+ if($('achievement-progress'))$('achievement-progress').textContent=`${count} / ${ACHIEVEMENTS.length} logros`;
+}
+let catchParticles=[];
+function spawnCatchParticles(x,y,rarity){
+ const cols=['#c9d7e2','#6ee7b7','#60a5fa','#c084fc','#fbbf24','#fb7185'];
+ const col=cols[Math.min(5,rarity)]||'#fff';
+ for(let i=0;i<12+rarity*3;i++){
+  catchParticles.push({x,y,vx:(Math.random()-.5)*4,vy:-1-Math.random()*3,life:.6+Math.random()*.5,col,r:2+Math.random()*3});
+ }
+}
+function showMissionCompleteFx(){
+ const el=$('fx-banner');if(!el)return;
+ el.classList.remove('hidden');el.classList.add('fx-show');
+ clearTimeout(showMissionCompleteFx._t);
+ showMissionCompleteFx._t=setTimeout(()=>el.classList.add('hidden'),1600);
+}
+const TUTORIAL_STEPS=[
+{id:0,title:'Bienvenido, capitán',text:'Sal a pescar, llena la bodega y vuelve al puerto.',target:null},
+{id:1,title:'Bodega',text:'Abre la Bodega para ver y vender tus capturas, o guardarlas en el almacén.',screen:'hold',highlight:'[data-screen=\"hold\"]'},
+{id:2,title:'Almacén',text:'Pulsa «Almacenar» en un pez de la bodega para reservarlo para contratos.',screen:'hold',highlight:'#warehouse-list'},
+{id:3,title:'Contratos',text:'En Misiones → Contratos entrega los peces del almacén y cobra la recompensa.',screen:'missions',highlight:'[data-screen=\"missions\"]',tab:'contracts'},
+{id:4,title:'¡Listo!',text:'Ya conoces el ciclo: pescar → almacenar → entregar contratos. ¡Buena suerte!',target:null}
+];
+function renderTutorial(){
+ const box=$('tutorial-overlay');if(!box)return;
+ if(state.tutorialDone||!state.hasStarted){box.classList.add('hidden');return;}
+ const step=TUTORIAL_STEPS[Math.min(state.tutorialStep||0,TUTORIAL_STEPS.length-1)];
+ box.classList.remove('hidden');
+ $('tutorial-title').textContent=step.title;
+ $('tutorial-text').textContent=step.text;
+ $('tutorial-step-label').textContent=`Paso ${(state.tutorialStep||0)+1} / ${TUTORIAL_STEPS.length}`;
+ document.querySelectorAll('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight'));
+ if(step.highlight){const t=document.querySelector(step.highlight);if(t)t.classList.add('tutorial-highlight')}
+}
+function advanceTutorial(){
+ if(state.tutorialDone)return;
+ state.tutorialStep=(state.tutorialStep||0)+1;
+ if(state.tutorialStep>=TUTORIAL_STEPS.length){state.tutorialDone=true;state.tutorialStep=TUTORIAL_STEPS.length-1;document.querySelectorAll('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight'));}
+ else {
+  const step=TUTORIAL_STEPS[state.tutorialStep];
+  if(step.screen){showScreen(step.screen);if(step.tab==='contracts'){missionTab='contracts';}}
+ }
+ save();renderTutorial();
+}
+function skipTutorial(){state.tutorialDone=true;save();renderTutorial();document.querySelectorAll('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight'));}
+
+const defaultState=()=>({money:150,day:1,zone:0,unlocked:[0],rod:1,boat:1,storageLevel:1,skillNodes:[],hold:[],discovered:[],sound:true,musicEnabled:true,musicVolume:35,effectsVolume:70,hasStarted:false,totalCaught:0,totalSales:0,boatSkin:0,treasures:[],relics:[],equippedRelics:[],relicStorageLevel:5,relicUpgradeNodes:[],aquarium:[],aquariumLevel:1,aquariumUpgrades:[],completedMissions:[],tournamentClaimed:false,_contractsDone:0,warehouse:[],warehouseUpgrades:[],dailyMissions:[],dailyDate:'',dailyProgress:{},contracts:[],contractsDate:'',achievements:[],tutorialStep:0,tutorialDone:false,zoneCoins:{},baits:{},activeBait:null,isNight:false,bossHp:{},bossDefeated:[],stats:{playSeconds:0,zoneCatches:{},mostValuable:null,dailyStreak:0,lastDailyDate:'',bitesWon:0,bitesLost:0,gachaOpens:0},sessionStart:0});
+let state=loadState(),activeScreen='intro',missionTab='story',timer=30,sessionActive=false,expeditionPausedForSettings=false,expeditionPausedForHold=false,cast=null,castCooldown=0,actors=[],lastFrame=0,raf=0,audioCtx=null,installPrompt=null,bookPage=0,treasureBookPage=0,aquariumPage=0,treasureView='equipment',toastTimeout=null;
 const music=$('background-music');
 function loadState(){try{const s=JSON.parse(localStorage.getItem('aventuraPesqueraSave'));if(s&&typeof s==='object'){const merged={...defaultState(),...s,unlocked:s.unlocked||[0],hold:s.hold||[],discovered:s.discovered||[],skillNodes:s.skillNodes||[],treasures:s.treasures||[],relics:s.relics||[],equippedRelics:s.equippedRelics||[],relicStorageLevel:5,relicUpgradeNodes:Array.isArray(s.relicUpgradeNodes)?[...new Set(s.relicUpgradeNodes.filter(i=>Number.isInteger(i)&&i>=0&&i<15))].sort((a,b)=>a-b):[],aquarium:s.aquarium||[],aquariumUpgrades:Array.isArray(s.aquariumUpgrades)?s.aquariumUpgrades:[],completedMissions:s.completedMissions||[]};if(!Array.isArray(s.relicUpgradeNodes)&&Number(s.relicStorageLevel)>5)merged.relicUpgradeNodes=Array.from({length:Math.min(15,Math.max(0,Math.floor(Number(s.relicStorageLevel)-5)))},(_,i)=>i);merged.relicStorageLevel=5+merged.relicUpgradeNodes.length;merged.equippedRelics=merged.equippedRelics.slice(0,Math.max(1,Math.min(5,(Number(merged.boatSkin)||0)+1)));merged.aquariumLevel=Math.max(1,Math.min(10,Math.floor(Number(s.aquariumLevel)||Math.min(10,Math.max(1,merged.aquarium.length||1)))));if(!Array.isArray(s.aquariumUpgrades)&&Number(s.aquariumLevel)>1)merged.aquariumUpgrades=Array.from({length:Math.min(30,(Math.min(10,Math.floor(Number(s.aquariumLevel))-1))*3)},(_,i)=>i);merged.aquariumUpgrades=[...new Set(merged.aquariumUpgrades.filter(id=>Number.isInteger(id)&&id>=0&&id<30))].sort((a,b)=>a-b);merged.aquarium=[...new Set(merged.aquarium.map(Number).filter(id=>Number.isInteger(id)&&id>=0&&id<fish.length))].slice(0,aquariumCapacityFor(merged.aquariumUpgrades));
 merged.warehouse=Array.isArray(s.warehouse)?s.warehouse.map(Number).filter(id=>Number.isInteger(id)&&id>=0&&id<fish.length):[];
@@ -42,6 +158,9 @@ merged.dailyDate=typeof s.dailyDate==='string'?s.dailyDate:'';
 merged.dailyProgress=s.dailyProgress&&typeof s.dailyProgress==='object'?s.dailyProgress:{};
 merged.contracts=Array.isArray(s.contracts)?s.contracts:[];
 merged.contractsDate=typeof s.contractsDate==='string'?s.contractsDate:'';
+merged.achievements=Array.isArray(s.achievements)?s.achievements.filter(id=>typeof id==='string'):[];
+merged.tutorialStep=Math.max(0,Math.floor(Number(s.tutorialStep)||0));
+merged.tutorialDone=Boolean(s.tutorialDone);
 return merged}}catch(e){}return defaultState()}
 function save(){try{localStorage.setItem('aventuraPesqueraSave',JSON.stringify(state))}catch(e){}}
 function exportSave(){try{const payload={app:'Aventura Pesquera',version:1,exportedAt:new Date().toISOString(),save:state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`aventura-pesquera-partida-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Partida exportada correctamente')}catch(e){modal({icon:'⚠️',title:'No se pudo exportar',desc:'Tu navegador no ha podido crear el archivo de la partida.',action:'Entendido'})}}
@@ -50,7 +169,9 @@ async function clearAppCache(){try{if('caches'in window){const keys=await caches
 function cash(n){return Math.round(n).toLocaleString('es-ES')+' €'}
 function hasSkill(id){return (state.skillNodes||[]).includes(id)}
 function skillCount(branch){return SKILLS.filter(n=>n.branch===branch&&hasSkill(n.id)).length}
-function capacity(){return 5+SKILLS.filter(n=>n.branch==='storage'&&n.effect==='capacity'&&hasSkill(n.id)).reduce((a,n)=>a+n.amount,0)}
+function currentBoat(){return boatTypes[Math.min(boatTypes.length-1,Math.max(0,Number(state.boatSkin)||0))]}
+function boatPassive(key){const p=currentBoat().passives||{};return p[key]||0}
+function capacity(){return 5+SKILLS.filter(n=>n.branch==='storage'&&n.effect==='capacity'&&hasSkill(n.id)).reduce((a,n)=>a+n.amount,0)+boatPassive('hold')}
 function warehouseOwned(id,owned=state.warehouseUpgrades||[]){return owned.includes(id)}
 function warehouseCapacityFor(owned=state.warehouseUpgrades||[]){return Math.min(50,5+owned.reduce((s,id)=>{const amount=id<5?2:id<10?3:4;return s+amount},0))}
 function warehouseCapacity(){return warehouseCapacityFor()}
@@ -70,32 +191,42 @@ function generateDailyMissions(){
  for(let i=0;i<3;i++){let ti=Math.floor(rng(10+i)*types.length);while(used.has(ti))ti=(ti+1)%types.length;used.add(ti);const t=types[ti];const goal=t.goal();picks.push({id:t.id+'-'+todayKey()+'-'+i,type:t.id,title:t.title,desc:typeof t.desc==='function'?t.desc(goal):t.desc,goal,reward:t.reward(),track:t.track,progress:0,claimed:false})}
  return picks;
 }
-function generateContracts(){
+function generateContracts(excludeBases=[],seedExtra=0){
  const unlockedZones=(state.unlocked||[0]).filter(z=>z>=0&&z<zones.length);
  const candidates=[];
  unlockedZones.forEach(zi=>{zones[zi].pool.forEach(bi=>{if(bi>=0&&bi<baseFish.length)candidates.push({base:bi,zone:zi})})});
  if(!candidates.length)return [];
- const seed=todayKey().split('-').reduce((a,b)=>a+Number(b),0)+99;
+ const seed=todayKey().split('-').reduce((a,b)=>a+Number(b),0)+99+(state._contractsDone||0)*17+seedExtra;
  const rng=(n)=>{const x=Math.sin(seed*19.19+n*47.47)*43758.5453;return x-Math.floor(x)};
- const count=2+Math.min(2,Math.floor(unlockedZones.length/3));
- const contracts=[];const usedBases=new Set();
- for(let i=0;i<count;i++){
+ const contracts=[];const usedBases=new Set(excludeBases);
+ for(let i=0;i<3;i++){
   let pick=candidates[Math.floor(rng(20+i)*candidates.length)];
-  let tries=0;while(usedBases.has(pick.base)&&tries<20){pick=candidates[Math.floor(rng(30+i+tries)*candidates.length)];tries++}
+  let tries=0;while(usedBases.has(pick.base)&&tries<40){pick=candidates[Math.floor(rng(30+i+tries)*candidates.length)];tries++}
   usedBases.add(pick.base);
   const b=baseFish[pick.base];
   const qty=1+Math.floor(rng(40+i)*3);
   const zoneBonus=zones[pick.zone].bonus||1;
   const reward=Math.round((b[2]*qty*zoneBonus)*(2.2+rng(50+i)*1.8)+80*qty);
-  contracts.push({id:'c-'+todayKey()+'-'+i,base:pick.base,name:b[0],emoji:b[1],qty,zone:pick.zone,zoneName:zones[pick.zone].name,reward,claimed:false});
+  contracts.push({id:'c-'+Date.now()+'-'+i+'-'+Math.random().toString(36).slice(2,7),base:pick.base,name:b[0],emoji:b[1],qty,zone:pick.zone,zoneName:zones[pick.zone].name,reward,claimed:false});
  }
  return contracts;
 }
+function generateOneContract(excludeBases=[]){
+ const batch=generateContracts(excludeBases,Math.floor(Math.random()*9999)+1);
+ return batch[0]||null;
+}
 function ensureDailyContent(){
  const key=todayKey();
- if(state.dailyDate!==key){state.dailyDate=key;state.dailyMissions=generateDailyMissions();state.dailyProgress={sessionCaught:0,rareCaught:0,soldValue:0,zoneTrip:0};state.contracts=generateContracts();state.contractsDate=key;save()}
+ if(state.dailyDate!==key){const prev=state.dailyDate;state.dailyDate=key;state.dailyMissions=generateDailyMissions();state.dailyProgress={sessionCaught:0,rareCaught:0,soldValue:0,zoneTrip:0};if(!state.stats)state.stats={};if(prev){const p=new Date(prev+'T12:00:00'),n=new Date(key+'T12:00:00');const diff=Math.round((n-p)/86400000);state.stats.dailyStreak=diff===1?(state.stats.dailyStreak||0)+1:1}else state.stats.dailyStreak=1;save()}
  if(!Array.isArray(state.dailyMissions)||!state.dailyMissions.length){state.dailyMissions=generateDailyMissions();save()}
- if(!Array.isArray(state.contracts)||!state.contracts.length){state.contracts=generateContracts();save()}
+ if(!Array.isArray(state.contracts))state.contracts=[];
+ state.contracts=state.contracts.filter(c=>c&&!c.claimed);
+ while(state.contracts.length<3){
+  const next=generateOneContract(state.contracts.map(c=>c.base));
+  if(!next)break;
+  state.contracts.push(next);
+ }
+ if(state.contracts.length>3)state.contracts=state.contracts.slice(0,3);
 }
 function trackDaily(track,amount=1){ensureDailyContent();if(!state.dailyProgress)state.dailyProgress={};state.dailyProgress[track]=(state.dailyProgress[track]||0)+amount;state.dailyMissions.forEach(m=>{if(m.track===track&&!m.claimed)m.progress=Math.min(m.goal,state.dailyProgress[track]||0)});save()}
 function warehouseCountByBase(baseId){return (state.warehouse||[]).filter(id=>fish[id]&&fish[id].base===baseId).length}
@@ -105,7 +236,12 @@ function deliverContract(contractId){
  const have=warehouseCountByBase(c.base);if(have<c.qty){toast(`Necesitas ${c.qty} ${c.name} en el almacén (tienes ${have})`);return}
  let left=c.qty;const next=[];
  for(const id of state.warehouse){if(left>0&&fish[id]&&fish[id].base===c.base){left--;continue}next.push(id)}
- state.warehouse=next;c.claimed=true;state.money+=c.reward;state.totalSales+=c.reward;state._contractsDone=(state._contractsDone||0)+1;save();updateTop();renderHold();renderMissions();sound('sell');toast(`Contrato entregado: +${cash(c.reward)}`);
+ state.warehouse=next;c.claimed=true;state.money+=c.reward;state.totalSales+=c.reward;state._contractsDone=(state._contractsDone||0)+1;if(!state.zoneCoins)state.zoneCoins={};const cz=Math.min(9,c.zone||0);if((state.unlocked||[]).includes(cz)&&Math.random()<0.45){state.zoneCoins[cz]=(state.zoneCoins[cz]||0)+1;toast(`${ZONE_COINS[cz].emoji} Moneda de contrato`);}
+ state.contracts=(state.contracts||[]).filter(x=>x.id!==c.id);
+ const replacement=generateOneContract(state.contracts.map(x=>x.base));
+ if(replacement)state.contracts.push(replacement);
+ while(state.contracts.length<3){const n=generateOneContract(state.contracts.map(x=>x.base));if(!n)break;state.contracts.push(n)}
+ save();updateTop();renderHold();renderMissions();sound('sell');toast(`Contrato entregado: +${cash(c.reward)} · Nuevo contrato disponible`);showMissionCompleteFx();checkAchievements();
 }
 function storeToWarehouse(holdIndex){
  if(holdIndex<0||holdIndex>=state.hold.length)return;
@@ -130,17 +266,18 @@ function boatSpeed(){const bonus=SKILLS.filter(n=>n.branch==='boat'&&n.effect===
 function fishValueMultiplier(f){let mult=1+SKILLS.filter(n=>n.branch==='storage'&&n.effect==='premium'&&hasSkill(n.id)).reduce((a,n)=>a+n.amount,0);if(f&&f.rarity>=2)mult+=SKILLS.filter(n=>n.branch==='storage'&&n.effect==='rarevalue'&&hasSkill(n.id)).reduce((a,n)=>a+n.amount,0);return mult}
 function currentZone(){return zones[state.zone]}
 function discoveredSet(){return new Set(state.discovered)}
-function price(f){return Math.max(1,Math.round(f.value*(1+(state.rod-1)*.025)*fishValueMultiplier(f)*(1+relicBonus('sale'))))}
-function syncMusicVolume(){if(music)music.volume=Math.max(0,Math.min(1,(Number(state.musicVolume)||0)/100))}
-function startMusic(){if(!music)return;syncMusicVolume();try{if(music.src!==new URL('./audio/AventuraPesquera.mp3',document.baseURI).href)music.src='./audio/AventuraPesquera.mp3';const attempt=music.play();if(attempt&&typeof attempt.catch==='function')attempt.catch(()=>{})}catch(e){/* La música nunca debe impedir que arranque el juego. */}}
+function price(f){const w=currentWeather(),s=currentSeason(),ev=activeEvent();let mul=(1+(state.rod-1)*.025)*fishValueMultiplier(f)*(1+relicBonus('sale'))*(w.priceMul||1)*(s.priceMul||1)*(ev&&ev.priceMul||1);return Math.max(1,Math.round(f.value*mul))}
+function syncMusicVolume(){if(!music)return;const on=state.musicEnabled!==false&&(Number(state.musicVolume)||0)>0;music.volume=on?Math.max(0,Math.min(1,(Number(state.musicVolume)||0)/100)):0;if(!on){try{music.pause()}catch(e){}}}
+function startMusic(){if(!music||state.musicEnabled===false)return;syncMusicVolume();try{if(music.src!==new URL('./audio/AventuraPesquera.mp3',document.baseURI).href)music.src='./audio/AventuraPesquera.mp3';const attempt=music.play();if(attempt&&typeof attempt.catch==='function')attempt.catch(()=>{const n=$('music-status');if(n)n.textContent='Música no disponible (offline o bloqueada por el navegador).'})}catch(e){const n=$('music-status');if(n)n.textContent='Música no disponible en este dispositivo.'}}
+function stopMusic(){if(!music)return;try{music.pause()}catch(e){}}
 function sound(type='click'){if(!state.sound||Number(state.effectsVolume)<=0)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const seq=type==='catch'?[520,680,850]:type==='sell'?[560,780]:type==='cast'?[300,470]:type==='upgrade'?[430,620,790]:[430];seq.forEach((hz,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type==='cast'?'triangle':'sine';o.frequency.value=hz;const volume=.035*(Math.max(0,Math.min(100,Number(state.effectsVolume)||0))/100);g.gain.setValueAtTime(volume,audioCtx.currentTime+i*.09);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+i*.09+.12);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+i*.09);o.stop(audioCtx.currentTime+i*.09+.13)})}catch(e){}}
-function showScreen(name){if(sessionActive&&name!=='fishing'&&name!=='settings')return;activeScreen=name;screens.forEach(s=>$(s).classList.toggle('hidden',s!==name));window.scrollTo({top:0,behavior:'smooth'});if(name==='menu')renderMenu();if(name==='zones')renderZones();if(name==='upgrades')renderUpgrades();if(name==='encyclopedia')renderBook();if(name==='hold')renderHold();if(name==='settings')renderSettings();if(name==='boat')renderBoat();if(name==='treasures')renderTreasures();if(name==='aquarium')renderAquarium();if(name==='missions')renderMissions();save()}
+function showScreen(name){if(sessionActive&&name!=='fishing'&&name!=='settings')return;activeScreen=name;screens.forEach(s=>$(s).classList.toggle('hidden',s!==name));window.scrollTo({top:0,behavior:'smooth'});if(name==='menu')renderMenu();if(name==='zones')renderZones();if(name==='upgrades')renderUpgrades();if(name==='encyclopedia')renderBook();if(name==='hold')renderHold();if(name==='settings')renderSettings();if(name==='boat')renderBoat();if(name==='treasures')renderTreasures();if(name==='aquarium')renderAquarium();if(name==='missions')renderMissions();if(name==='achievements')renderAchievements();if(name==='gacha')renderGacha();if(name==='stats')renderStats();if(name==='menu')renderBaitShop();renderTutorial();save()}
 function openSettings(){if(activeScreen==='fishing'&&sessionActive){sessionActive=false;expeditionPausedForSettings=true;keys.left=false;keys.right=false;lastFrame=0}sound('click');showScreen('settings')}
 function returnFromSettings(){if(expeditionPausedForSettings){expeditionPausedForSettings=false;showScreen('fishing');sessionActive=true;lastFrame=0;startLoop();return}showScreen('menu')}
 function updateTop(){ $('money').textContent=cash(state.money);$('day').textContent='Día '+state.day;$('menu-day').textContent=state.day;$('encyclopedia-progress').textContent=state.discovered.length.toLocaleString('es-ES')+' / 1.200 descubiertos';$('hold-summary').textContent=state.hold.length+' peces almacenados';updateExpeditionHoldCounter()}
 function updateExpeditionHoldCounter(){const count=state.hold.length,cap=capacity();if($('expedition-hold-count'))$('expedition-hold-count').textContent=`${count} / ${cap}`;if($('expedition-hold-capacity'))$('expedition-hold-capacity').textContent=`${count} / ${cap}`;if($('expedition-hold-free'))$('expedition-hold-free').textContent=String(Math.max(0,cap-count))}
-function renderMenu(){updateTop();$('current-zone-title').textContent=currentZone().name;$('current-zone-desc').textContent=currentZone().desc}
-function renderZones(){ $('zone-grid').innerHTML=zones.map((z,i)=>{let unlocked=state.unlocked.includes(i),current=i===state.zone;return `<button class="zone-card ${current?'current':''}" data-zone="${i}" ${!unlocked&&state.money<z.price?'disabled':''}><span class="zone-art" style="background:linear-gradient(145deg,${z.color[0]},${z.color[1]})">${z.emoji}</span><span class="zone-info"><b>${z.name}</b><p>${z.desc}</p><small>◉ ${z.depth} · ${z.pool.length} especies base</small></span><span class="zone-price">${current?'ACTUAL':unlocked?'DESBLOQUEADA':cash(z.price)}</span>${!unlocked?'<span class="zone-lock">🔒</span>':''}</button>`}).join('')}
+function renderMenu(){updateTop();$('current-zone-title').textContent=currentZone().name;$('current-zone-desc').textContent=currentZone().desc;dailyWorld();const ach=$('menu-achievements-count');if(ach)ach.textContent=`${(state.achievements||[]).length}/${ACHIEVEMENTS.length}`;renderTutorial();}
+function renderZones(){ $('zone-grid').innerHTML=zones.map((z,i)=>{if(z.secret&&!state.unlocked.includes(i))return `<button class="zone-card" disabled><span class="zone-art" style="background:linear-gradient(145deg,#1a0a2e,#4c1d95)">🔒</span><span class="zone-info"><b>Zona Secreta</b><p>Requiere logro Explorador y evento Portal secreto.</p></span><span class="zone-price">BLOQUEADA</span></button>`;let unlocked=state.unlocked.includes(i),current=i===state.zone;return `<button class="zone-card ${current?'current':''}" data-zone="${i}" ${!unlocked&&state.money<z.price?'disabled':''}><span class="zone-art" style="background:linear-gradient(145deg,${z.color[0]},${z.color[1]})">${z.emoji}</span><span class="zone-info"><b>${z.name}</b><p>${z.desc}</p><small>◉ ${z.depth} · ${z.pool.length} especies base</small></span><span class="zone-price">${current?'ACTUAL':unlocked?'DESBLOQUEADA':cash(z.price)}</span>${!unlocked?'<span class="zone-lock">🔒</span>':''}</button>`}).join('')}
 const SKILLS=[
 {id:'b1',branch:'boat',icon:'🐟',name:'Radar de cardúmenes',desc:'+2 peces nadando por expedición.',cost:250,effect:'spawn',amount:2,req:null},
 {id:'b2',branch:'boat',icon:'💨',name:'Motor afinado',desc:'El barco se desplaza un 25 % más rápido.',cost:700,effect:'speed',amount:.25,req:'b1'},
@@ -262,12 +399,45 @@ function normalizeTreasureAbilities(){
  }
 }
 const boatTypes=[
-{name:'Barco de madera',emoji:'⛵',cost:0,desc:'Tu primera embarcación, sencilla y fiable. 1 espacio para tesoros equipables.',slots:1},
-{name:'Lancha de pesca',emoji:'🚤',cost:1800,desc:'Embarcación ágil preparada para mares abiertos. 2 espacios para tesoros equipables.',slots:2},
-{name:'Cúter oceánico',emoji:'🛥️',cost:12000,desc:'Una embarcación robusta para expediciones largas. 3 espacios para tesoros equipables.',slots:3},
-{name:'Yate explorador',emoji:'🚢',cost:85000,desc:'Tecnología avanzada y gran prestigio. 4 espacios para tesoros equipables.',slots:4},
-{name:'Leviatán',emoji:'🐉',cost:450000,desc:'Una nave excepcional para capitanes legendarios. 5 espacios para tesoros equipables.',slots:5}
+{name:'Barco de madera',emoji:'⛵',cost:0,desc:'1 espacio tesoro. Sin pasivas especiales.',slots:1,passives:{hold:0,treasure:0,rare:0,zoneBonus:null}},
+{name:'Lancha de pesca',emoji:'🚤',cost:1800,desc:'2 tesoros · +2 bodega · +10 % tesoros.',slots:2,passives:{hold:2,treasure:.10,rare:0,zoneBonus:null}},
+{name:'Cúter oceánico',emoji:'🛥️',cost:12000,desc:'3 tesoros · +4 bodega · +15 % rareza en Mar abierto y más allá.',slots:3,passives:{hold:4,treasure:.08,rare:.12,zoneBonus:[3,4,5,6,7,8,9]}},
+{name:'Yate explorador',emoji:'🚢',cost:85000,desc:'4 tesoros · +6 bodega · +20 % tesoros · +15 % rareza global.',slots:4,passives:{hold:6,treasure:.20,rare:.15,zoneBonus:null}},
+{name:'Leviatán',emoji:'🐉',cost:450000,desc:'5 tesoros · +10 bodega · +25 % tesoros · +25 % rareza · bonus en zonas altas.',slots:5,passives:{hold:10,treasure:.25,rare:.25,zoneBonus:[6,7,8,9,10]}}
 ];
+const ZONE_COINS=[
+{id:0,name:'Moneda de costa',emoji:'🪙',color:'#94a3b8'},
+{id:1,name:'Moneda de coral',emoji:'🟠',color:'#fb923c'},
+{id:2,name:'Moneda esmeralda',emoji:'🟢',color:'#34d399'},
+{id:3,name:'Moneda oceánica',emoji:'🔵',color:'#38bdf8'},
+{id:4,name:'Moneda tropical',emoji:'🟡',color:'#fbbf24'},
+{id:5,name:'Moneda glacial',emoji:'❄️',color:'#e0f2fe'},
+{id:6,name:'Moneda abisal',emoji:'🟣',color:'#a78bfa'},
+{id:7,name:'Moneda de naufragio',emoji:'⚓',color:'#78716c'},
+{id:8,name:'Moneda estelar',emoji:'✨',color:'#fde68a'},
+{id:9,name:'Moneda de Leviatán',emoji:'🐉',color:'#c4b5fd'}
+];
+const BAITS=[
+{id:'common',name:'Cebo común',emoji:'🪱',cost:40,desc:'Más peces comunes.',commonMul:1.5,rareMul:.7,deepMul:1},
+{id:'rare',name:'Señuelo brillante',emoji:'✨',cost:180,desc:'Más rarezas.',commonMul:.6,rareMul:1.8,deepMul:1},
+{id:'shark',name:'Cebo de sangre',emoji:'🩸',cost:320,desc:'Atrae tiburones y depredadores.',commonMul:.5,rareMul:1.3,deepMul:1,boostBases:[21,22,23,24]},
+{id:'deep',name:'Plomada abisal',emoji:'⚓',cost:250,desc:'Más peces de profundidad.',commonMul:.8,rareMul:1.1,deepMul:2.2},
+{id:'night',name:'Luz de luna',emoji:'🌙',cost:200,desc:'Ideal de noche: +rareza nocturna.',commonMul:.7,rareMul:1.4,deepMul:1.2,nightBonus:1.3}
+];
+const ZONE_BOSSES=[
+{zone:0,name:'Rey de la costa',emoji:'👑',base:9,hp:3,reward:400},
+{zone:1,name:'Guardián de coral',emoji:'🪸',base:17,hp:4,reward:900},
+{zone:2,name:'Señor esmeralda',emoji:'🌿',base:41,hp:4,reward:1800},
+{zone:3,name:'Titán del mar abierto',emoji:'🌊',base:23,hp:5,reward:4000},
+{zone:4,name:'Emperador tropical',emoji:'🌺',base:45,hp:5,reward:8000},
+{zone:5,name:'Coloso glacial',emoji:'🧊',base:24,hp:6,reward:15000},
+{zone:6,name:'Horror abisal',emoji:'🌑',base:55,hp:6,reward:28000},
+{zone:7,name:'Capitán fantasma',emoji:'👻',base:56,hp:7,reward:45000},
+{zone:8,name:'Estrella viviente',emoji:'✨',base:58,hp:7,reward:70000},
+{zone:9,name:'Leviatán anciano',emoji:'🐲',base:59,hp:8,reward:120000},
+{zone:10,name:'Guardian del portal',emoji:'🌀',base:57,hp:9,reward:200000}
+];
+
 const missionDefs=[
 {id:'catch10',title:'Primeros pasos',desc:'Pesca 10 peces en total.',goal:10,reward:350,icon:'🎣',progress:()=>state.totalCaught},
 {id:'catch50',title:'Pescador habitual',desc:'Pesca 50 peces en total.',goal:50,reward:1200,icon:'🐟',progress:()=>state.totalCaught},
@@ -298,7 +468,7 @@ const missionDefs=[
 {id:'warehouse5',title:'Logística básica',desc:'Guarda 5 peces a la vez en el almacén.',goal:5,reward:600,icon:'📦',progress:()=>(state.warehouse||[]).length},
 {id:'contracts3',title:'Contratista fiable',desc:'Completa 3 contratos de entrega.',goal:3,reward:2000,icon:'📋',progress:()=>state._contractsDone||0}
 ];
-function renderBoat(){const level=Math.min(boatTypes.length-1,Math.max(0,Number(state.boatSkin)||0)),b=boatTypes[level];$('boat-emoji').textContent=b.emoji;$('boat-name').textContent=b.name;$('boat-stats').textContent=`Barco ${level+1}/${boatTypes.length} · Espacios de tesoro equipables ${boatRelicSlots()}/5`;$('boat-options').innerHTML=boatTypes.map((x,i)=>`<article class="feature-card ${i===level?'feature-active':''}"><div class="feature-emoji">${x.emoji}</div><h3>${x.name}</h3><p>${x.desc}</p><small>${x.slots} espacio${x.slots>1?'s':''} equipable${x.slots>1?'s':''}${i===level?' · ACTUAL':i<level?' · Desbloqueado':' · Coste: '+cash(x.cost)}</small><button class="${i===level?'secondary':'primary'}" data-boat="${i}" ${i<=level||state.money<x.cost?'disabled':''}>${i===level?'Equipado':i<level?'Adquirido':'Comprar y equipar'}</button></article>`).join('')}
+function renderBoat(){const level=Math.min(boatTypes.length-1,Math.max(0,Number(state.boatSkin)||0)),b=boatTypes[level];$('boat-emoji').textContent=b.emoji;$('boat-name').textContent=b.name;$('boat-stats').textContent=`Barco ${level+1}/${boatTypes.length} · Tesoro ${boatRelicSlots()}/5 · Bodega +${boatPassive('hold')} · Tesoros +${Math.round(boatPassive('treasure')*100)}% · Rareza +${Math.round(boatPassive('rare')*100)}%`;$('boat-options').innerHTML=boatTypes.map((x,i)=>`<article class="feature-card ${i===level?'feature-active':''}"><div class="feature-emoji">${x.emoji}</div><h3>${x.name}</h3><p>${x.desc}</p><small>${x.slots} espacio${x.slots>1?'s':''} equipable${x.slots>1?'s':''}${i===level?' · ACTUAL':i<level?' · Desbloqueado':' · Coste: '+cash(x.cost)}</small><button class="${i===level?'secondary':'primary'}" data-boat="${i}" ${i<=level||state.money<x.cost?'disabled':''}>${i===level?'Equipado':i<level?'Adquirido':'Comprar y equipar'}</button></article>`).join('')}
 function buyBoat(level){const b=boatTypes[level];if(!b||level<=state.boatSkin||state.money<b.cost)return;state.money-=b.cost;state.boatSkin=level;state.boat=Math.max(1,level+1);save();updateTop();renderBoat();sound('upgrade');toast(`¡Barco mejorado! ${b.name} · ${b.slots} espacios de tesoro`)}
 function renderTreasures(){
  const treasures=state.treasures||[],relics=state.relics||[],all=[...relics.map(r=>({...r,isRelic:true})),...treasures.map(t=>({...t,isRelic:false}))];
@@ -327,7 +497,7 @@ function treasureCatalog(){return [...relicTemplates.map(t=>({...t,rarity:relicR
 function treasureCatalogFound(t){return t.kind==='relic'?(state.relics||[]).some(r=>r.templateId===t.templateId):(state.treasures||[]).some(r=>r.name===t.name)}
 function renderTreasureEncyclopedia(){const root=$('treasure-encyclopedia-list');if(!root)return;const fullCatalog=treasureCatalog(),discoveredCount=fullCatalog.filter(t=>treasureCatalogFound(t)).length,query=($('treasure-search')?.value||'').trim().toLocaleLowerCase('es'),filter=$('treasure-rarity-filter')?.value||'all';let catalog=fullCatalog.filter(t=>{const found=treasureCatalogFound(t),rarity=Number.isInteger(t.rarity)&&t.rarity>=0&&t.rarity<=5?t.rarity:Math.max(0,Math.min(5,relicRarityIndex[t.rank]??relicRarity.indexOf(t.rank)??0));const queryMatch=!query||(found&&t.name.toLocaleLowerCase('es').includes(query));const filterMatch=filter==='all'||(filter==='found'&&found)||(filter==='unknown'&&!found)||(/^\d$/.test(filter)&&rarity===Number(filter));return queryMatch&&filterMatch});const pages=Math.max(1,Math.ceil(catalog.length/24));treasureBookPage=Math.max(0,Math.min(treasureBookPage,pages-1));$('treasure-catalog-count').textContent=`${discoveredCount.toLocaleString('es-ES').padStart(3,'0')} de ${fullCatalog.length} tesoros descubiertos`;$('treasure-page-label').textContent=`Página ${treasureBookPage+1} / ${pages}`;$('treasure-prev-page').disabled=treasureBookPage===0;$('treasure-next-page').disabled=treasureBookPage>=pages-1;root.innerHTML=catalog.slice(treasureBookPage*24,treasureBookPage*24+24).map(t=>{const found=treasureCatalogFound(t);const rarity=Number.isInteger(t.rarity)&&t.rarity>=0&&t.rarity<=5?t.rarity:Math.max(0,Math.min(5,relicRarityIndex[t.rank]??relicRarity.indexOf(t.rank)??0));const rarityName=relicRarity[rarity]||t.rank||'Común';const safeKey=t.catalogKey.replace(/&/g,'&amp;').replace(/"/g,'&quot;');const foundItem=found?(t.kind==='relic'?(state.relics||[]).find(r=>r.templateId===t.templateId):(state.treasures||[]).find(r=>r.name===t.name)):null;const zoneTxt=foundItem&&foundItem.zone?` · Zona: ${foundItem.zone}`:' · Cualquier zona (más valioso en zonas altas)';return `<button type="button" class="fish-card treasure-catalog-card ${found?'catalog-found':'catalog-unknown'}" data-treasure-catalog="${safeKey}" aria-label="${found?'Ver '+t.name:'Tesoro por descubrir · rareza '+rarityName}"><span class="fish-emoji">${found?t.emoji:'❔'}</span><b>${found?t.name:'????????'}</b><span class="rarity r${rarity}">${found?rarityName:'Por descubrir'}</span><small>${found?(t.passive||'Pieza recuperada en una expedición')+zoneTxt:'Encuentra este tesoro en cualquier zona (más valioso en zonas altas).'}</small></button>`}).join('')||'<div class="empty-state">No hay tesoros que coincidan con la búsqueda.</div>'}
 function openTreasureCatalogDetail(key){const [kind,...parts]=String(key||'').split(':');const raw=parts.join(':');let item;if(kind==='relic')item=relicTemplates.find(t=>String(t.templateId)===raw);else item=treasureTypes.find(t=>t.name===raw);if(!item)return;const foundItem=kind==='relic'?(state.relics||[]).find(r=>r.templateId===item.templateId):(state.treasures||[]).find(t=>t.name===item.name);const found=!!foundItem;const rarity=kind==='relic'?(relicRarityIndex[item.rank]??0):(Number.isInteger(item.rarity)?item.rarity:0);if(!found){modal({icon:'❔',eyebrow:'ENCICLOPEDIA DE TESOROS',title:'Por descubrir',desc:'Todavía no has encontrado esta pieza. Aparece en cualquier zona; su valor aumenta en zonas más altas.',stats:[['Estado','Por descubrir'],['Rareza',relicRarity[rarity]||item.rank||'Común'],['Zona','Cualquier zona']],action:'Cerrar'});return}modal({icon:item.emoji,eyebrow:'ENCICLOPEDIA DE TESOROS',title:item.name,desc:item.passive||'Pieza de colección que puedes vender para financiar tu aventura.',stats:[['Estado','Descubierto'],['Rareza',relicRarity[rarity]||item.rank||'Común'],['Valor base',cash(item.value)],['Zona encontrada',foundItem.zone||'Cualquier zona']],action:'Cerrar'})}
-function findTreasure(){if((state.relics||[]).length+(state.treasures||[]).length>=relicCapacity())return null;if(Math.random()<.18){const relic=findRelic();if(relic)return {...relic,isRelic:true}}if(Math.random()>.28)return null;const t=treasureTypes[Math.floor(Math.random()*treasureTypes.length)],item={...t,id:Date.now()+Math.random(),value:Math.round(t.value*(1+state.zone*.25)),zone:currentZone().name};state.treasures.push(item);return item}
+function findTreasure(){if((state.relics||[]).length+(state.treasures||[]).length>=relicCapacity())return null;if(Math.random()<.18){const relic=findRelic();if(relic)return {...relic,isRelic:true}}const tMul=(currentWeather().treasureMul||1)*((activeEvent()&&activeEvent().treasureMul)||1)*(1+boatPassive('treasure'));if(Math.random()>Math.min(.62,.28*tMul))return null;const t=treasureTypes[Math.floor(Math.random()*treasureTypes.length)],item={...t,id:Date.now()+Math.random(),value:Math.round(t.value*(1+state.zone*.25)),zone:currentZone().name};state.treasures.push(item);return item}
 const AQUARIUM_SKILLS=Array.from({length:30},(_,index)=>{const rank=Math.floor(index/3)+1,rawType=['space','price','quality'][index%3],type=rawType==='quality'&&Math.floor(index/3)>=5?'price':rawType,qualityRank=type==='quality'?Math.floor(index/3):0,zoneGate=type==='quality'?[1,1,3,5,7][qualityRank]||7:0;const names=type==='space'?['Pecera auxiliar','Tanque reforzado','Acuario panorámico','Depósito de arrecife','Tanque de corrientes','Pecera oceánica','Cúpula marina','Gran tanque abisal','Santuario de especies','Expansión magistral']:type==='price'?['Entradas económicas','Carteles informativos','Visitas guiadas','Iluminación premium','Alimentación selecta','Marketing marino','Experiencia inmersiva','Galería de lujo','Patrocinio oceánico','Marca legendaria']:['Vitrina de poco comunes','Vitrina de raros','Vitrina de épicos','Vitrina de legendarios','Vitrina de míticos','Conservación avanzada','Laboratorio de rarezas','Pabellón de élite','Centro de conservación','Maestría del museo'];const rarityLabel=['Poco común','Raro','Épico','Legendario','Mítico'];return {id:index,type,rank,zoneGate,name:type==='quality'?('Vitrina de '+rarityLabel[Math.min(4,Math.floor(index/3))].toLocaleLowerCase('es')):names[rank-1],unlockLabel:rarityLabel[Math.min(4,Math.floor(index/3))],cost:Math.round(250*Math.pow(1.42,index)),icon:type==='space'?'🫧':type==='price'?'💰':'🔬',percent:type==='price'?4+rank*1.5:type==='quality'?3+rank:0}});
 const WAREHOUSE_SKILLS=Array.from({length:15},(_,index)=>{const amount=index<5?2:index<10?3:4;const names=['Estantería básica','Cajones de red','Cámara frigorífica','Pasillo de estiba','Almacén modular','Bodega reforzada','Depósito costero','Cámara industrial','Nave de carga','Almacén portuario','Centro logístico','Silos marinos','Gran depósito','Almacén oceánico','Mega almacén'];return {id:index,name:names[index],amount,cost:Math.round(400*Math.pow(1.55,index)),icon:'📦',desc:`+${amount} espacios de almacén (capacidad total hasta ${Math.min(50,5+Array.from({length:index+1},(_,i)=>i<5?2:i<10?3:4).reduce((a,b)=>a+b,0))}).`}});
 function upgradeWarehouse(id){const next=WAREHOUSE_SKILLS.find(n=>!warehouseOwned(n.id));const skill=id===undefined?next:WAREHOUSE_SKILLS[id];if(!skill||warehouseOwned(skill.id)||next?.id!==skill.id)return;if(state.money<skill.cost){toast(`Necesitas ${cash(skill.cost)}`);return}state.money-=skill.cost;state.warehouseUpgrades.push(skill.id);state.warehouseUpgrades.sort((a,b)=>a-b);save();updateTop();renderUpgrades();renderHold();sound('upgrade');toast(`Almacén ampliado: ${warehouseCapacity()}/50 espacios`)}
@@ -343,29 +513,37 @@ function aquariumDailyIncome(){return (state.aquarium||[]).reduce((sum,id)=>sum+
 function aquariumUpgradeCost(){const next=AQUARIUM_SKILLS.find(n=>!aquariumOwned(n.id));return next?next.cost:0}
 function upgradeAquarium(id){const next=AQUARIUM_SKILLS.find(n=>!aquariumOwned(n.id));const skill=id===undefined?next:AQUARIUM_SKILLS[id];if(!skill||aquariumOwned(skill.id)||next?.id!==skill.id)return;if(!state.unlocked.includes(skill.zoneGate)){toast(`Desbloquea primero ${zones[skill.zoneGate].name} para esta mejora`);return}if(state.money<skill.cost){toast(`Necesitas ${cash(skill.cost)} para esta mejora`);return}state.money-=skill.cost;state.aquariumUpgrades.push(skill.id);state.aquariumUpgrades.sort((a,b)=>a-b);state.aquariumLevel=aquariumCapacity();save();updateTop();renderAquarium();renderUpgrades();sound('upgrade');toast(`Mejora desbloqueada: ${skill.name}`)}
 function renderAquarium(){const query=($('aquarium-search')?.value||'').trim().toLocaleLowerCase('es'),allDiscovered=state.discovered.filter(id=>fish[id]&&fish[id].name.toLocaleLowerCase('es').includes(query)),shown=state.aquarium||[],cap=aquariumCapacity(),income=aquariumDailyIncome();const pages=Math.max(1,Math.ceil(allDiscovered.length/24));aquariumPage=Math.max(0,Math.min(aquariumPage,pages-1));$('aquarium-count').textContent=shown.length;$('aquarium-income').textContent=cash(income);$('aquarium-summary').textContent=`${shown.length}/${cap} peces · +${Math.round(aquariumPriceBonus()*100)}% ingresos`;$('aquarium-capacity').textContent=`${shown.length} / ${cap}`;$('aquarium-income-total').textContent=cash(income)+' / día';$('aquarium-tank').innerHTML=shown.length?shown.map((id,i)=>{const f=fish[id];return `<button type="button" class="tank-fish tank-fish-${i%5}" data-aquarium-info="${id}" title="Ver información de ${f.name}" style="--fish-delay:${i*-1.7}s">${f.emoji}</button>`}).join(''):'<div class="tank-empty"><span>🐠</span><b>Tu pecera está vacía</b><span>Elige un pez descubierto de la colección de abajo.</span></div>';$('aquarium-page-label').textContent=`Página ${aquariumPage+1} / ${pages}`;$('aquarium-prev-page').disabled=aquariumPage===0;$('aquarium-next-page').disabled=aquariumPage>=pages-1;$('aquarium-list').innerHTML=allDiscovered.length?allDiscovered.slice(aquariumPage*24,aquariumPage*24+24).map(id=>{const f=fish[id],isShown=shown.includes(id),full=!isShown&&shown.length>=cap,qualityLocked=!aquariumRarityUnlocked(f.rarity);return `<article class="feature-card aquarium-choice ${isShown?'feature-active':''} ${qualityLocked?'quality-locked':''}"><div class="feature-emoji">${qualityLocked?'🔒':f.emoji}</div><h3>${f.name}</h3><p>${rarities[f.rarity]} · ${f.weight} kg</p><strong>${qualityLocked?'Requiere mejora de museo':'Genera '+cash(aquariumFishIncome(id))+' / día'}</strong>${qualityLocked?`<small>Desbloquea la mejora de calidad para exponer esta rareza.</small>`:`<button class="${isShown?'secondary':'primary'}" data-aquarium="${id}" ${isShown||full?'disabled':''}>${isShown?'En la pecera':full?'Mejora la capacidad':'Añadir a la pecera'}</button>`}</article>`}).join(''):'<div class="empty-state">🐠 Descubre peces en tus expediciones para añadirlos al acuario.</div>'}
-function claimDailyMission(id){ensureDailyContent();const m=(state.dailyMissions||[]).find(x=>x.id===id);if(!m||m.claimed||(m.progress||0)<m.goal)return;m.claimed=true;state.money+=m.reward;save();updateTop();renderMissions();sound('upgrade');toast(`Misión diaria completada: +${cash(m.reward)}`)}
+function claimDailyMission(id){ensureDailyContent();const m=(state.dailyMissions||[]).find(x=>x.id===id);if(!m||m.claimed||(m.progress||0)<m.goal)return;m.claimed=true;state.money+=m.reward;save();updateTop();renderMissions();sound('upgrade');showMissionCompleteFx();toast(`Misión diaria completada: +${cash(m.reward)}`);checkAchievements()}
 function claimStoryMission(id){
  const m=missionDefs.find(x=>x.id===id);if(!m)return;
  if((state.completedMissions||[]).includes(id))return;
  const n=Math.min(m.goal,m.progress());
  if(n<m.goal)return;
  if(!state.completedMissions)state.completedMissions=[];
- state.completedMissions.push(id);state.money+=m.reward;save();updateTop();renderMissions();sound('upgrade');toast(`Misión completada: ${m.title} · +${cash(m.reward)}`);
+ state.completedMissions.push(id);state.money+=m.reward;save();updateTop();renderMissions();sound('upgrade');showMissionCompleteFx();toast(`Misión completada: ${m.title} · +${cash(m.reward)}`);checkAchievements();
+}
+function setMissionTab(tab){
+ missionTab=['story','daily','contracts'].includes(tab)?tab:'story';
+ document.querySelectorAll('[data-mission-tab]').forEach(b=>b.classList.toggle('active',b.dataset.missionTab===missionTab));
+ ['story','daily','contracts'].forEach(t=>{
+  const panel=$('mission-panel-'+t);
+  if(panel)panel.classList.toggle('hidden',t!==missionTab);
+ });
 }
 function renderMissions(){
  ensureDailyContent();
  const countdown=formatCountdown(msUntilMidnight());
  if($('daily-countdown'))$('daily-countdown').textContent=countdown;
- if($('daily-reset-label'))$('daily-reset-label').textContent='Reinicio a las 00:00 · queda '+countdown;
+ if($('daily-reset-label'))$('daily-reset-label').textContent=missionTab==='daily'?'Reinicio a las 00:00 · queda '+countdown:(missionTab==='contracts'?'Siempre 3 contratos activos · al completar aparece otro':'Misiones permanentes de progreso');
  const dailyHtml=(state.dailyMissions||[]).map(m=>{
   const n=Math.min(m.goal,m.progress||0),done=!!m.claimed,ready=n>=m.goal&&!done;
   return `<article class="feature-card"><div class="feature-emoji">${done?'✅':'📅'}</div><h3>${m.title}</h3><p>${m.desc}</p><div class="mission-progress"><span style="width:${Math.min(100,n/m.goal*100)}%"></span></div><small>${done?'Completada':n+' / '+m.goal} · Recompensa ${cash(m.reward)}</small><button class="${ready?'primary':'secondary'}" data-daily="${m.id}" ${!ready?'disabled':''}>${done?'Completada':ready?'Cobrar recompensa':'En progreso'}</button></article>`;
  }).join('')||'<div class="empty-state">No hay misiones diarias.</div>';
  if($('daily-mission-list'))$('daily-mission-list').innerHTML=dailyHtml;
- const contractHtml=(state.contracts||[]).map(c=>{
-  const have=warehouseCountByBase(c.base),done=!!c.claimed,ready=!done&&have>=c.qty;
-  return `<article class="feature-card"><div class="feature-emoji">${done?'✅':c.emoji||'📦'}</div><h3>Entregar ${c.qty}× ${c.name}</h3><p>Zona: ${c.zoneName}. Guarda los peces en el almacén de la bodega y entrégalos aquí.</p><div class="mission-progress"><span style="width:${Math.min(100,have/c.qty*100)}%"></span></div><small>${done?'Entregado':have+' / '+c.qty+' en almacén'} · Recompensa ${cash(c.reward)}</small><button class="${ready?'primary':'secondary'}" data-deliver="${c.id}" ${!ready?'disabled':''}>${done?'Entregado':ready?'Entregar':'Faltan peces'}</button></article>`;
- }).join('')||'<div class="empty-state">No hay contratos activos hoy.</div>';
+ const contractHtml=(state.contracts||[]).filter(c=>!c.claimed).map(c=>{
+  const have=warehouseCountByBase(c.base),ready=have>=c.qty;
+  return `<article class="feature-card"><div class="feature-emoji">${c.emoji||'📦'}</div><h3>Entregar ${c.qty}× ${c.name}</h3><p>Zona: ${c.zoneName}. Guarda los peces en el almacén de la bodega y entrégalos aquí.</p><div class="mission-progress"><span style="width:${Math.min(100,have/c.qty*100)}%"></span></div><small>${have+' / '+c.qty+' en almacén'} · Recompensa ${cash(c.reward)}</small><button class="${ready?'primary':'secondary'}" data-deliver="${c.id}" ${!ready?'disabled':''}>${ready?'Entregar':'Faltan peces'}</button></article>`;
+ }).join('')||'<div class="empty-state">No hay contratos activos.</div>';
  if($('contract-list'))$('contract-list').innerHTML=contractHtml;
  const completed=new Set(state.completedMissions||[]);
  const storyHtml=missionDefs.map(m=>{
@@ -375,20 +553,180 @@ function renderMissions(){
  }).join('');
  if($('story-mission-list'))$('story-mission-list').innerHTML=storyHtml;
  if($('mission-list'))$('mission-list').innerHTML='';
+ setMissionTab(missionTab);
 }
 function claimMission(id){claimStoryMission(id)}
-function dailyWorld(){const seasons=['Primavera','Verano','Otoño','Invierno'],weather=['☀️ Soleado','🌧️ Lluvia','🌫️ Niebla','🌬️ Viento'];const season=seasons[Math.floor((state.day-1)/7)%4],wx=weather[(state.day*7+state.zone*3)%weather.length];const badge=$('.weather-badge');if(badge)badge.innerHTML=`${wx.split(' ')[0]} <span>${wx.split(' ').slice(1).join(' ')} · ${season}</span>`;}
-function renderSettings(){$('sound-toggle').textContent=state.sound?'Activados':'Desactivados';$('sound-toggle').classList.toggle('on',state.sound);$('sound-toggle').setAttribute('aria-pressed',String(state.sound));$('music-volume').value=state.musicVolume;$('music-volume-value').textContent=state.musicVolume+' %';$('effects-volume').value=state.effectsVolume;$('effects-volume-value').textContent=state.effectsVolume+' %';syncMusicVolume();$('install-app').disabled=!installPrompt}
+function dailyWorld(){const w=currentWeather(),s=currentSeason(),ev=activeEvent();const badge=document.querySelector('.weather-badge');if(badge)badge.innerHTML=`${w.emoji} <span>${w.name} · ${s.name}</span>`;const tip=document.querySelector('.daily-tip');if(tip){const parts=[`<b>${w.emoji} ${w.name}:</b> ${w.desc}`,`<b>${s.emoji} ${s.name}:</b> ${s.desc}`];if(ev)parts.push(`<b>${ev.emoji} Evento:</b> ${ev.name} — ${ev.desc} (${ev.dayLeft}d)`);tip.innerHTML='💡 '+parts.join(' · ')}const banner=$('event-banner');if(banner){if(ev){banner.classList.remove('hidden');banner.innerHTML=`${ev.emoji} <b>${ev.name}</b> — ${ev.desc} <small>· ${ev.dayLeft}d</small>`}else banner.classList.add('hidden')}if(ev)state._playedEvent=true;}
+function renderSettings(){$('sound-toggle').textContent=state.sound?'Efectos: ON':'Efectos: OFF';$('sound-toggle').classList.toggle('on',state.sound);$('sound-toggle').setAttribute('aria-pressed',String(state.sound));const me=state.musicEnabled!==false;if($('music-toggle')){$('music-toggle').textContent=me?'Música: ON':'Música: OFF';$('music-toggle').classList.toggle('on',me);$('music-toggle').setAttribute('aria-pressed',String(me))}$('music-volume').value=state.musicVolume;$('music-volume-value').textContent=state.musicVolume+' %';$('effects-volume').value=state.effectsVolume;$('effects-volume-value').textContent=state.effectsVolume+' %';syncMusicVolume();$('install-app').disabled=!installPrompt}
 function toast(message){$('sea-message').textContent=message;$('sea-message').classList.remove('hidden');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>{if(sessionActive)$('sea-message').textContent='A / D para moverte · E para pescar'},1800)}
-function pickFish(){const z=currentZone(),maxSpecies=Math.min(fish.length,baseFish.length*(state.zone+1)*2),possible=fish.filter(f=>z.pool.includes(f.base)&&f.id<maxSpecies);const rareBonus=SKILLS.filter(n=>n.branch==='rod'&&n.effect==='rare'&&hasSkill(n.id)).reduce((a,n)=>a+n.amount,0);const base=[68,22,7.5,2,.45,.05];const weatherIndex=(state.day*7+state.zone*3)%4,seasonIndex=Math.floor((state.day-1)/7)%4;const weights=possible.map(f=>{let w=base[f.rarity];if(f.rarity>=2)w*=1+(rareBonus+relicBonus('rare'))*7;if(f.rarity>=4)w*=1+rareBonus*12;if(weatherIndex===1&&f.rarity>=2)w*=1.18;if(weatherIndex===2&&f.depth>250)w*=1.25;if(weatherIndex===3&&f.speed>1.1)w*=1.2;if(seasonIndex===3&&f.depth>350)w*=1.2;if(seasonIndex===1&&f.rarity<=1)w*=1.15;return w});let total=weights.reduce((a,b)=>a+b,0),r=Math.random()*total;for(let i=0;i<possible.length;i++){r-=weights[i];if(r<=0)return possible[i]}return possible[0]||fish[0]}
+function pickFish(){const z=currentZone(),maxSpecies=Math.min(fish.length,baseFish.length*(state.zone+1)*2);let possible=fish.filter(f=>z.pool.includes(f.base)&&f.id<maxSpecies);const ev=activeEvent();if(ev&&ev.poolBoost&&ev.poolBoost.length){const boosted=fish.filter(f=>ev.poolBoost.includes(f.base)&&f.id<maxSpecies);if(boosted.length)possible=possible.concat(boosted)}const bait=BAITS.find(b=>b.id===state.activeBait);if(bait&&bait.boostBases){const extra=fish.filter(f=>bait.boostBases.includes(f.base)&&f.id<maxSpecies);possible=possible.concat(extra)}const boss=ZONE_BOSSES.find(b=>b.zone===state.zone);if(boss&&!(state.bossDefeated||[]).includes(state.zone)&&Math.random()<(.04+(state.isNight?0.03:0))){const bf=fish.find(f=>f.base===boss.base&&f.id<baseFish.length)||fish.find(f=>f.base===boss.base);if(bf)return {...bf,_boss:true,_bossHp:state.bossHp?.[state.zone]??boss.hp}}const rareBonus=SKILLS.filter(n=>n.branch==='rod'&&n.effect==='rare'&&hasSkill(n.id)).reduce((a,n)=>a+n.amount,0)+boatPassive('rare')+(currentBoat().passives?.zoneBonus?.includes(state.zone)?0.08:0);const baseW=[68,22,7.5,2,.45,.05];const w=currentWeather(),s=currentSeason();const weights=possible.map(f=>{let wt=baseW[f.rarity]||1;if(f.rarity>=2)wt*=1+(rareBonus+relicBonus('rare'))*7;if(f.rarity>=4)wt*=1+rareBonus*12;if(f.rarity<=1)wt*=(w.commonMul||1)*(s.commonMul||1)*(bait?.commonMul||1);if(f.rarity>=2)wt*=(w.rareMul||1)*(s.rareMul||1)*(ev&&ev.rareMul||1)*(bait?.rareMul||1);if((w.depthBoost||s.depthBoost||(bait&&bait.deepMul>1))&&f.depth>250)wt*=1.35*(bait?.deepMul||1);if(w.speedBoost&&f.speed>1.1)wt*=1.3;if(ev&&ev.poolBoost&&ev.poolBoost.includes(f.base))wt*=2.2;if(bait&&bait.boostBases&&bait.boostBases.includes(f.base))wt*=2.5;if(state.isNight){if(f.rarity>=2)wt*=1.25*(bait?.nightBonus||1);if(f.depth>200)wt*=1.2}return wt});let total=weights.reduce((a,b)=>a+b,0),r=Math.random()*total;for(let k=0;k<possible.length;k++){r-=weights[k];if(r<=0)return possible[k]}return possible[0]||fish[0]}
 function desiredActorCount(){const extra=SKILLS.filter(n=>n.branch==='boat'&&n.effect==='spawn'&&hasSkill(n.id)).reduce((a,n)=>a+n.amount,0);return 3+extra}
 function spawnActor(){const f=pickFish();return {f,x:65+Math.random()*830,y:235+Math.random()*235,dir:Math.random()>.5?1:-1,speed:13+Math.random()*24,phase:Math.random()*6.28,scale:.68+Math.random()*.42,depth:Math.random()}}
 function ensureActors(){const target=desiredActorCount();while(actors.length<target)actors.push(spawnActor());if(actors.length>target)actors.length=target}
 function initActors(){actors=[];ensureActors()}
-function startFishing(){if(sessionActive)return;sessionActive=true;timer=sessionDuration();state._sessionCaught=0;cast=null;castCooldown=0;initActors();showScreen('fishing');$('fishing-zone-title').textContent=currentZone().name;$('fishing-zone-label').textContent='EXPEDICIÓN · DÍA '+state.day;$('timer').innerHTML=`${timer}<span>s</span>`;$('sea-message').textContent='A / D para moverte · E para pescar';$('cast-label').textContent='Lanzar caña';$('cast-button').disabled=false;lastFrame=0;sound('cast');if(!raf)raf=requestAnimationFrame(frame);else lastFrame=0}
-function endFishing(){if(!sessionActive)return;sessionActive=false;cast=null;const treasure=findTreasure();state.money+=aquariumDailyIncome();state.day++;trackDaily('zoneTrip',1);save();updateTop();renderTreasures();dailyWorld();showScreen('menu');const n=state._sessionCaught||0;state._sessionCaught=0;renderMissions();modal({icon:treasure?'🗝️':'🌅',eyebrow:treasure?'¡HALLAZGO EN EL NAUFRAGIO!':'EXPEDICIÓN COMPLETADA',title:treasure?`¡Has encontrado ${treasure.name}!`:'¡De vuelta al puerto!',desc:(n?`Has regresado con ${n} ${n===1?'captura':'capturas'}. `:'')+(treasure?`Entre los restos de un naufragio has recuperado ${treasure.name}, valorado en ${cash(treasure.value)}. `:'')+'Puedes vender capturas y tesoros, equipar tesoros para obtener habilidades pasivas y preparar otra salida.',stats:[['Capturas',String(n)],['Bodega',`${state.hold.length}/${capacity()}`],...(treasure?[['Tesoro',cash(treasure.value)]]:[])],action:'Continuar al puerto',onAction:()=>{hideModal();renderMenu()}})}
+function startFishing(){if(sessionActive)return;sessionActive=true;if(!state.stats)state.stats={};state.stats.sessionStart=Date.now();timer=sessionDuration();state._sessionCaught=0;cast=null;castCooldown=0;initActors();showScreen('fishing');$('fishing-zone-title').textContent=currentZone().name;$('fishing-zone-label').textContent=(state.isNight?'🌙 NOCTURNA · ':'EXPEDICIÓN · ')+'DÍA '+state.day;$('timer').innerHTML=`${timer}<span>s</span>`;$('sea-message').textContent='A / D para moverte · E para pescar';$('cast-label').textContent='Lanzar caña';$('cast-button').disabled=false;lastFrame=0;sound('cast');if(!raf)raf=requestAnimationFrame(frame);else lastFrame=0}
+
+function checkSecretZone(){
+ const ev=activeEvent();
+ const hasExplore=(state.achievements||[]).includes('explorer')||(state.unlocked||[]).length>=5;
+ if(ev&&ev.secret&&hasExplore&&!(state.unlocked||[]).includes(10)){
+  state.unlocked.push(10);toast('🌀 ¡Zona Secreta desbloqueada!');showMissionCompleteFx();
+ }
+}
+function buyBait(id){
+ const b=BAITS.find(x=>x.id===id);if(!b)return;
+ if(state.money<b.cost){toast('No te alcanza');return}
+ state.money-=b.cost;if(!state.baits)state.baits={};state.baits[id]=(state.baits[id]||0)+1;save();updateTop();renderBaitShop();toast(`Comprado: ${b.name}`);
+}
+function equipBait(id){
+ if(id&&!(state.baits&&state.baits[id]>0)){toast('No tienes ese cebo');return}
+ state.activeBait=id||null;save();renderBaitShop();toast(id?`Cebo equipado: ${BAITS.find(b=>b.id===id).name}`:'Cebo quitado');
+}
+function renderBaitShop(){
+ const root=$('bait-list');if(!root)return;
+ root.innerHTML=BAITS.map(b=>{
+  const qty=state.baits?.[b.id]||0;const on=state.activeBait===b.id;
+  return `<article class="feature-card ${on?'feature-active':''}"><div class="feature-emoji">${b.emoji}</div><h3>${b.name}</h3><p>${b.desc}</p><small>Tienes: ${qty} · ${cash(b.cost)}</small><div class="hold-actions"><button class="secondary" data-buy-bait="${b.id}">Comprar</button><button class="${on?'secondary':'primary'}" data-equip-bait="${b.id}" ${qty<1&&!on?'disabled':''}>${on?'Equipado':'Equipar'}</button></div></article>`;
+ }).join('')+`<article class="feature-card"><div class="feature-emoji">🚫</div><h3>Sin cebo</h3><p>Pesca normal sin sesgo.</p><button class="secondary" data-equip-bait="">Quitar cebo</button></article>`;
+}
+function openGacha(zoneId){
+ zoneId=Number(zoneId);
+ if(!(state.unlocked||[]).includes(zoneId)){toast('Desbloquea la zona primero');return}
+ const coins=state.zoneCoins||{};
+ const coinId=zoneId===10?9:zoneId;
+ if((coins[coinId]||0)<1){toast('Necesitas 1 moneda de esta zona');return}
+ state.zoneCoins[coinId]-=1;
+ const pool=zones[zoneId]?.pool||[0];
+ const bi=pool[Math.floor(Math.random()*pool.length)];
+ const candidates=fish.filter(f=>f.base===bi);
+ const f=candidates[Math.floor(Math.random()*Math.min(candidates.length,40))]||fish[bi];
+ if(!state.warehouse)state.warehouse=[];
+ if(state.warehouse.length>=warehouseCapacity()){
+  // refund if no space? put in hold if space
+  if(state.hold.length<capacity())state.hold.push(f.id);
+  else {state.zoneCoins[coinId]=(state.zoneCoins[coinId]||0)+1;toast('Almacén y bodega llenos');return}
+ } else state.warehouse.push(f.id);
+ if(!state.discovered.includes(f.id))state.discovered.push(f.id);
+ state.stats=state.stats||{};state.stats.gachaOpens=(state.stats.gachaOpens||0)+1;
+ save();playGachaAnim(f,zoneId);renderGacha();renderHold();updateTop();checkAchievements();
+}
+function playGachaAnim(f,zoneId){
+ const el=$('gacha-anim');if(!el)return;
+ el.classList.remove('hidden');el.classList.add('gacha-spin');
+ $('gacha-anim-emoji').textContent='❓';
+ $('gacha-anim-name').textContent='Abriendo…';
+ setTimeout(()=>{
+  $('gacha-anim-emoji').textContent=f.emoji;
+  $('gacha-anim-name').textContent=f.name;
+  el.classList.remove('gacha-spin');el.classList.add('gacha-reveal');
+  sound('upgrade');
+  setTimeout(()=>{el.classList.add('hidden');el.classList.remove('gacha-reveal');toast(`${f.emoji} ${f.name} → almacén`)},1400);
+ },900);
+}
+function renderGacha(){
+ const root=$('gacha-list');if(!root)return;
+ const coins=state.zoneCoins||{};
+ root.innerHTML=zones.slice(0,10).map((z,i)=>{
+  const unlocked=(state.unlocked||[]).includes(i);
+  const c=coins[i]||0;
+  return `<article class="feature-card ${unlocked?'':'quality-locked'}"><div class="feature-emoji">${unlocked?z.emoji:'🔒'}</div><h3>${z.name}</h3><p>Máquina gachapón · ${ZONE_COINS[i].emoji} ${ZONE_COINS[i].name}</p><strong>${c} monedas</strong><button class="primary" data-gacha="${i}" ${!unlocked||c<1?'disabled':''}>${unlocked?(c<1?'Sin monedas':'Abrir (1 moneda)'):'Zona bloqueada'}</button></article>`;
+ }).join('');
+ // secret
+ const i=10;const z=zones[10];if(z){
+  const unlocked=(state.unlocked||[]).includes(10);const c=coins[9]||0; // uses leviatán coin or secret - use coin 9
+  root.innerHTML+=`<article class="feature-card ${unlocked?'':'quality-locked'}"><div class="feature-emoji">${unlocked?z.emoji:'🔒'}</div><h3>${z.name}</h3><p>Usa monedas de Leviatán ${ZONE_COINS[9].emoji}</p><strong>${coins[9]||0} monedas</strong><button class="primary" data-gacha-secret="1" ${!unlocked||(coins[9]||0)<1?'disabled':''}>${unlocked?'Abrir secreto':'Bloqueada'}</button></article>`;
+ }
+}
+function renderStats(){
+ const s=state.stats||{};
+ const zc=s.zoneCatches||{};
+ let favZ=0,favN=0;Object.entries(zc).forEach(([z,n])=>{if(n>favN){favN=n;favZ=Number(z)}});
+ const mv=s.mostValuable;
+ const el=$('stats-panel');if(!el)return;
+ const playMin=Math.floor((s.playSeconds||0)/60);
+ el.innerHTML=`<div class="wallet-panel"><div><small>Tiempo de juego</small><h2>${playMin} min</h2></div><div><small>Capturas</small><h2>${state.totalCaught}</h2></div><div><small>Racha diarias</small><h2>${s.dailyStreak||0}</h2></div></div>
+ <div class="feature-grid">
+ <article class="feature-card"><div class="feature-emoji">🗺️</div><h3>Zona favorita</h3><p>${zones[favZ]?.name||'—'} (${favN} capturas)</p></article>
+ <article class="feature-card"><div class="feature-emoji">${mv?.emoji||'🐟'}</div><h3>Pez más valioso</h3><p>${mv?mv.name+' · '+cash(mv.value):'Aún no'}</p></article>
+ <article class="feature-card"><div class="feature-emoji">🎯</div><h3>Minijuego de pique</h3><p>Acertados ${s.bitesWon||0} · Fallados ${s.bitesLost||0}</p></article>
+ <article class="feature-card"><div class="feature-emoji">🎰</div><h3>Gachapones</h3><p>${s.gachaOpens||0} aperturas</p></article>
+ <article class="feature-card"><div class="feature-emoji">⚔️</div><h3>Jefes derrotados</h3><p>${(state.bossDefeated||[]).length} / ${ZONE_BOSSES.length}</p></article>
+ <article class="feature-card"><div class="feature-emoji">🌙</div><h3>Modo</h3><p>${state.isNight?'Pesca nocturna activa':'Día'}</p></article>
+ </div>`;
+}
+
+function endFishing(){if(!sessionActive&&!reelGame)return;sessionActive=false;reelGame=null;const rp=$('reel-minigame');if(rp)rp.classList.add('hidden');cast=null;const treasure=findTreasure();state.money+=aquariumDailyIncome();
+ // zone coin chance
+ if(!state.zoneCoins)state.zoneCoins={};
+ const zCoin=Math.min(9,state.zone);
+ if(Math.random()<0.22+(state.isNight?0.08:0)){state.zoneCoins[zCoin]=(state.zoneCoins[zCoin]||0)+1;toast(`${ZONE_COINS[zCoin].emoji} +1 ${ZONE_COINS[zCoin].name}`);}
+ if(state.activeBait&&Math.random()<0.55){state.baits[state.activeBait]=Math.max(0,(state.baits[state.activeBait]||0)-1);if((state.baits[state.activeBait]||0)<=0)state.activeBait=null;}
+ const wasNight=state.isNight;state.isNight=false;
+ if(!wasNight)state.day++;
+ trackDaily('zoneTrip',1);checkSecretZone();checkAchievements();save();updateTop();renderTreasures();dailyWorld();showScreen('menu');const n=state._sessionCaught||0;state._sessionCaught=0;renderMissions();modal({icon:treasure?'🗝️':'🌅',eyebrow:treasure?'¡HALLAZGO EN EL NAUFRAGIO!':'EXPEDICIÓN COMPLETADA',title:treasure?`¡Has encontrado ${treasure.name}!`:'¡De vuelta al puerto!',desc:(n?`Has regresado con ${n} ${n===1?'captura':'capturas'}. `:'')+(treasure?`Entre los restos de un naufragio has recuperado ${treasure.name}, valorado en ${cash(treasure.value)}. `:'')+'Puedes vender capturas y tesoros, equipar tesoros para obtener habilidades pasivas y preparar otra salida.',stats:[['Capturas',String(n)],['Bodega',`${state.hold.length}/${capacity()}`],...(treasure?[['Tesoro',cash(treasure.value)]]:[])],action:'Continuar al puerto',onAction:()=>{hideModal();renderMenu()}})}
+
+let reelGame=null;
+function startReelMinigame(f){
+ if(reelGame)return;
+ sessionActive=false;keys.left=false;keys.right=false;
+ const windowSize=.18+Math.random()*.08; // green zone size
+ const target=0.35+Math.random()*0.35;
+ reelGame={f,t:0,pos:0,dir:1,speed:1.1+(f.rarity||0)*.15+(f._boss?0.35:0),target,window:windowSize,resolved:false};
+ const panel=$('reel-minigame');
+ if(panel){panel.classList.remove('hidden');$('reel-fish-name').textContent=(f._boss?'⚔️ JEFE · ':'')+f.name;$('reel-fish-emoji').textContent=f.emoji}
+}
+function resolveReel(success){
+ if(!reelGame||reelGame.resolved)return;
+ reelGame.resolved=true;
+ const f=reelGame.f;
+ const panel=$('reel-minigame');if(panel)panel.classList.add('hidden');
+ if(success){
+  if(!state.stats)state.stats={bitesWon:0,bitesLost:0};
+  state.stats.bitesWon=(state.stats.bitesWon||0)+1;
+  if(f._boss){
+   const boss=ZONE_BOSSES.find(b=>b.zone===state.zone);
+   if(boss){
+    if(!state.bossHp)state.bossHp={};
+    const hp=(state.bossHp[state.zone]??boss.hp)-1;
+    state.bossHp[state.zone]=hp;
+    if(hp<=0){
+     state.bossDefeated=state.bossDefeated||[];
+     if(!state.bossDefeated.includes(state.zone))state.bossDefeated.push(state.zone);
+     state.money+=boss.reward;toast(`¡Jefe derrotado! +${cash(boss.reward)}`);
+     showMissionCompleteFx();
+    } else toast(`Jefe: ${hp}/${boss.hp} golpes restantes`);
+   }
+  }
+  cast={phase:'bite',t:0,target:{f},hit:true,x:0,y:0};
+  caught(f);
+ } else {
+  state.stats=state.stats||{};state.stats.bitesLost=(state.stats.bitesLost||0)+1;
+  cast=null;castCooldown=.5;$('cast-label').textContent='Lanzar caña';
+  $('sea-message').textContent='Se escapó… ¡Inténtalo de nuevo!';
+  toast('El pez se ha escapado');
+  sessionActive=true;lastFrame=0;startLoop();
+ }
+ reelGame=null;save();
+}
+function tryReelHook(){
+ if(!reelGame||reelGame.resolved)return;
+ const g=reelGame;
+ const inZone=Math.abs(g.pos-g.target)<=g.window/2;
+ resolveReel(inZone);
+}
+function updateReelMinigame(dt){
+ if(!reelGame||reelGame.resolved)return;
+ const g=reelGame;
+ g.pos+=g.dir*g.speed*dt;
+ if(g.pos>=1){g.pos=1;g.dir=-1}if(g.pos<=0){g.pos=0;g.dir=1}
+ const needle=$('reel-needle'),zone=$('reel-zone');
+ if(needle)needle.style.left=(g.pos*100)+'%';
+ if(zone){zone.style.left=((g.target-g.window/2)*100)+'%';zone.style.width=(g.window*100)+'%'}
+ g.t+=dt;if(g.t>4.5)resolveReel(false);
+}
+
 function castLine(){if(!sessionActive||cast||castCooldown>0)return;if(state.hold.length>=capacity()){toast('¡Bodega llena! Vende tus capturas en el puerto.');return}const bx=100+(boatPosition*(canvas.width-200));cast={t:0,x:bx+12,y:205,phase:'cast',target:null,hit:false};castCooldown=.35;$('cast-label').textContent='Línea en el agua…';$('sea-message').textContent='La caña desciende: ¡el primer pez que toque será tu captura!';sound('cast')}
-function caught(f){if(!sessionActive||!cast)return;if(state.hold.length>=capacity()){cast=null;toast('¡Bodega llena!');return}state.hold.push(f.id);if(!state.discovered.includes(f.id))state.discovered.push(f.id);state.totalCaught++;state._sessionCaught=(state._sessionCaught||0)+1;trackDaily('sessionCaught',1);if(f.rarity>=2)trackDaily('rareCaught',1);cast=null;castCooldown=.5;$('cast-label').textContent='Lanzar caña';$('bite-flash').classList.remove('hidden');$('bite-flash').textContent='¡CAPTURA!';ensureActors();sound('catch');save();updateTop();if(activeScreen==='fishing'&&expeditionPausedForHold)renderExpeditionHold();renderCatchModal(f)}
+function caught(f){if(!cast&&!reelGame)return;if(state.hold.length>=capacity()){cast=null;toast('¡Bodega llena!');sessionActive=true;return}state.hold.push(f.id);if(!state.discovered.includes(f.id))state.discovered.push(f.id);state.totalCaught++;state._sessionCaught=(state._sessionCaught||0)+1;trackDaily('sessionCaught',1);if(f.rarity>=2)trackDaily('rareCaught',1);if(currentWeather().id==='storm')state._caughtInStorm=true;const bx=100+(boatPosition*(canvas.width-200)),by=190;spawnCatchParticles(bx,by,f.rarity);checkAchievements();cast=null;castCooldown=.5;$('cast-label').textContent='Lanzar caña';$('bite-flash').classList.remove('hidden');$('bite-flash').textContent='¡CAPTURA!';ensureActors();sound('catch');save();updateTop();if(activeScreen==='fishing'&&expeditionPausedForHold)renderExpeditionHold();renderCatchModal(f)}
 function renderCatchModal(f){const value=price(f);sessionActive=false;keys.left=false;keys.right=false;const rarity=rarities[f.rarity],boss=f.rarity===5;modal({icon:f.emoji,eyebrow:boss?'¡JEFE MARINO LEGENDARIO!':'¡NUEVA CAPTURA!',title:boss?`¡Encuentro mítico: ${f.name}!`:f.name,desc:boss?`Has logrado capturar una criatura mítica de ${currentZone().name}. Este encuentro extraordinario cuenta como una victoria contra un jefe marino y queda registrado en tu enciclopedia.`:`Has pescado un ejemplar de rareza ${rarity}. La expedición queda pausada mientras admiras tu captura.`,stats:[['Rareza',rarity],['Peso',f.weight+' kg'],['Valor',cash(value)]],action:'Continuar pescando',onAction:()=>{hideModal();$('bite-flash').classList.add('hidden');$('sea-message').textContent=`${f.emoji} ${f.name} · ${cash(value)} · ¡Sigue pescando!`;sessionActive=true;lastFrame=0;startLoop()}})}
 const canvas=$('sea'),ctx=canvas.getContext('2d');function roundedRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
 function drawFish(a,t){ctx.save();ctx.translate(a.x,a.y+Math.sin(t*.0017+a.phase)*5);ctx.scale(a.dir*a.scale,a.scale);const col=rColors[a.f.rarity];ctx.globalAlpha=.95;ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(0,0,15,8,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(-23,-8);ctx.lineTo(-22,8);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(-1,-6);ctx.lineTo(4,-13);ctx.lineTo(7,-5);ctx.fill();ctx.fillStyle='#06243b';ctx.beginPath();ctx.arc(8,-2,1.5,0,Math.PI*2);ctx.fill();if(a.f.rarity>=4){ctx.globalAlpha=.25;ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,21,13,0,0,Math.PI*2);ctx.stroke()}ctx.restore()}
@@ -440,9 +778,11 @@ if(skin===0){
  ctx.fillStyle='#7c3aed';ctx.globalAlpha=.35;ctx.beginPath();ctx.ellipse(0,20,55,8,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
 }
 ctx.restore();
-if(cast){const startX=bx+12,startY=by+12;cast.t+=dt;cast.y=Math.min(485,cast.y+dt*(hasSkill('b4')?235:175));const contactRadius=(hasSkill('b6')?24:15)+SKILLS.filter(n=>n.branch==='rod'&&n.effect==='range'&&hasSkill(n.id)).reduce((a,n)=>a+n.amount/12,0)+relicBonus('radius')*9;let contact=null,bestDistance=Infinity;for(const a of actors){const dx=Math.abs(a.x-cast.x),dy=Math.abs(a.y-cast.y);if(dx<contactRadius+a.scale*10&&dy<12+a.scale*6&&dy<bestDistance){contact=a;bestDistance=dy}}if(contact&&!cast.hit){cast.hit=true;cast.target=contact;cast.phase='bite';cast.t=0;cast.y=contact.y;cast.x=contact.x;actors=actors.filter(a=>a!==contact);$('sea-message').textContent='¡Picada! Recogiendo tu captura…';sound('catch')}if(cast.phase==='bite'){cast.t+=dt;cast.y+=(startY-cast.y)*Math.min(1,dt*1.7);if(cast.t>.48){caught(cast.target.f)}}else if(cast.y>=485){cast=null;castCooldown=.45;$('cast-label').textContent='Lanzar caña';$('sea-message').textContent='No había peces en el recorrido. Muévete con A/D y prueba otra vez.'}if(cast){ctx.strokeStyle='#f4fff8';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(startX,startY);ctx.quadraticCurveTo(startX+18,startY+65,cast.x,cast.y);ctx.stroke();ctx.fillStyle='#ff696e';ctx.beginPath();ctx.ellipse(cast.x,cast.y,5,9,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#e1ffffaa';ctx.beginPath();ctx.ellipse(cast.x,cast.y+9,12+Math.sin(t*.008)*3,3,0,0,Math.PI*2);ctx.stroke()}}
-ctx.fillStyle='#ffffffc9';ctx.font='bold 14px system-ui';ctx.fillText(z.emoji+' '+z.name,20,29)}
-let boatPosition=.5;function frame(t){if(activeScreen!=='fishing'&&!sessionActive){raf=0;return}if(!lastFrame)lastFrame=t;let dt=Math.min(.05,(t-lastFrame)/1000);lastFrame=t;if(sessionActive){timer-=dt;if(timer<=0){timer=0;$('timer').innerHTML='0<span>s</span>';drawScene(t,0);endFishing();raf=0;return}if(keys.left)boatPosition=Math.max(.015,boatPosition-boatSpeed()*dt);if(keys.right)boatPosition=Math.min(.985,boatPosition+boatSpeed()*dt);if(castCooldown>0)castCooldown-=dt;$('timer').innerHTML=`${Math.ceil(timer)}<span>s</span>`;drawScene(t,dt);raf=requestAnimationFrame(frame)}else{raf=0}}
+if(cast){const startX=bx+12,startY=by+12;cast.t+=dt;cast.y=Math.min(485,cast.y+dt*(hasSkill('b4')?235:175));const contactRadius=(hasSkill('b6')?24:15)+SKILLS.filter(n=>n.branch==='rod'&&n.effect==='range'&&hasSkill(n.id)).reduce((a,n)=>a+n.amount/12,0)+relicBonus('radius')*9;let contact=null,bestDistance=Infinity;for(const a of actors){const dx=Math.abs(a.x-cast.x),dy=Math.abs(a.y-cast.y);if(dx<contactRadius+a.scale*10&&dy<12+a.scale*6&&dy<bestDistance){contact=a;bestDistance=dy}}if(contact&&!cast.hit){cast.hit=true;cast.target=contact;cast.phase='bite';cast.t=0;cast.y=contact.y;cast.x=contact.x;actors=actors.filter(a=>a!==contact);$('sea-message').textContent='¡Picada! ¡Pulsa en el momento justo!';sound('catch');startReelMinigame(contact.f)}if(cast.phase==='bite'){/* minijuego de pique activo */}else if(cast.y>=485){cast=null;castCooldown=.45;$('cast-label').textContent='Lanzar caña';$('sea-message').textContent='No había peces en el recorrido. Muévete con A/D y prueba otra vez.'}if(cast){ctx.strokeStyle='#f4fff8';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(startX,startY);ctx.quadraticCurveTo(startX+18,startY+65,cast.x,cast.y);ctx.stroke();ctx.fillStyle='#ff696e';ctx.beginPath();ctx.ellipse(cast.x,cast.y,5,9,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#e1ffffaa';ctx.beginPath();ctx.ellipse(cast.x,cast.y+9,12+Math.sin(t*.008)*3,3,0,0,Math.PI*2);ctx.stroke()}}
+// catch particles
+for(let i=catchParticles.length-1;i>=0;i--){const p=catchParticles[i];p.life-=dt;p.x+=p.vx;p.y+=p.vy;p.vy+=8*dt;ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();if(p.life<=0)catchParticles.splice(i,1)}ctx.globalAlpha=1;
+ctx.fillStyle='#ffffffc9';ctx.font='bold 14px system-ui';ctx.fillText(z.emoji+' '+z.name,20,29);const wx=currentWeather();ctx.fillText(wx.emoji+' '+wx.name,20,48);const evx=activeEvent();if(evx)ctx.fillText(evx.emoji+' '+evx.name,20,67)}
+let boatPosition=.5;function frame(t){if(activeScreen!=='fishing'&&!sessionActive){raf=0;return}if(!lastFrame)lastFrame=t;let dt=Math.min(.05,(t-lastFrame)/1000);lastFrame=t;if(sessionActive){timer-=dt;if(timer<=0){timer=0;$('timer').innerHTML='0<span>s</span>';drawScene(t,0);endFishing();raf=0;return}if(keys.left)boatPosition=Math.max(.015,boatPosition-boatSpeed()*dt);if(keys.right)boatPosition=Math.min(.985,boatPosition+boatSpeed()*dt);if(castCooldown>0)castCooldown-=dt;if(reelGame)updateReelMinigame(dt);$('timer').innerHTML=`${Math.ceil(timer)}<span>s</span>`;drawScene(t,dt);raf=requestAnimationFrame(frame)}else{if(reelGame){updateReelMinigame(dt);drawScene(t,dt);raf=requestAnimationFrame(frame)}else raf=0}}
 const keys={left:false,right:false};function startLoop(){if(!raf)raf=requestAnimationFrame(frame)}
 function modal({icon='🐟',eyebrow='AVENTURA',title,desc='',stats=[],action='Continuar',onAction=hideModal}){const actionButton=$('modal-action');actionButton.disabled=false;actionButton.removeAttribute('aria-disabled');actionButton.textContent=action;actionButton.onclick=onAction;$('modal-icon').textContent=icon;$('modal-eyebrow').textContent=eyebrow;$('modal-title').textContent=title;$('modal-desc').textContent=desc;$('modal-stats').innerHTML=stats.map(s=>`<div class="modal-stat"><small>${s[0]}</small><b>${s[1]}</b></div>`).join('');$('modal').classList.toggle('catch-modal',String(eyebrow).includes('CAPTURA'));$('modal').classList.remove('hidden')}
 function hideModal(){$('modal').classList.add('hidden')}
@@ -453,9 +793,15 @@ function selectZone(i){const z=zones[i];if(!z)return;if(!state.unlocked.includes
 // Sistemas adicionales: astillero, tesoros, acuario, contratos y torneo.
 $('boat-options').addEventListener('click',e=>{const b=e.target.closest('[data-boat]');if(b)buyBoat(Number(b.dataset.boat))});$('treasure-slots')?.addEventListener('click',e=>{const b=e.target.closest('[data-unequip-relic]');if(!b)return;state.equippedRelics=state.equippedRelics.filter(id=>String(id)!==String(b.dataset.unequipRelic));save();renderTreasures();sound('click')});$('treasure-encyclopedia-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-treasure-catalog]');if(b)openTreasureCatalogDetail(b.dataset.treasureCatalog)});function setTreasureView(view){treasureView=view==='encyclopedia'?'encyclopedia':'equipment';$('treasure-equipment-view').classList.toggle('hidden',treasureView!=='equipment');$('treasure-encyclopedia-view').classList.toggle('hidden',treasureView!=='encyclopedia');if(treasureView==='encyclopedia')renderTreasureEncyclopedia();sound('click')} $('open-treasure-encyclopedia').addEventListener('click',()=>setTreasureView('encyclopedia'));$('close-treasure-encyclopedia').addEventListener('click',()=>setTreasureView('equipment'));$('treasure-search').addEventListener('input',()=>{treasureBookPage=0;renderTreasureEncyclopedia()});$('treasure-rarity-filter').addEventListener('change',()=>{treasureBookPage=0;renderTreasureEncyclopedia()});$('treasure-prev-page').addEventListener('click',()=>{treasureBookPage--;renderTreasureEncyclopedia()});$('treasure-next-page').addEventListener('click',()=>{treasureBookPage++;renderTreasureEncyclopedia()});$('aquarium-prev-page').addEventListener('click',()=>{aquariumPage--;renderAquarium()});$('aquarium-next-page').addEventListener('click',()=>{aquariumPage++;renderAquarium()});$('treasure-list').addEventListener('click',e=>{const st=e.target.closest('[data-sell-treasure]');if(st){const id=st.dataset.sellTreasure,t=state.treasures.find(x=>String(x.id)===String(id));if(!t)return;state.treasures=state.treasures.filter(x=>String(x.id)!==String(id));state.equippedRelics=state.equippedRelics.filter(x=>String(x)!==String(id));state.money+=t.value;state.totalSales+=t.value;save();updateTop();renderTreasures();sound('sell');return}const eq=e.target.closest('[data-equip-relic]');if(eq){const id=String(eq.dataset.equipRelic),item=[...(state.relics||[]),...(state.treasures||[])].find(x=>String(x.id)===id);if(!item)return;if((state.equippedRelics||[]).some(x=>String(x)===id))return;if(state.equippedRelics.length>=boatRelicSlots()){toast('No tienes espacios de tesoros disponibles');return}if(!item.bonus){const template=treasureTypes.find(x=>x.name===item.name);if(template){item.bonus=template.bonus;item.passive=item.passive||template.passive}}state.equippedRelics.push(id);save();renderTreasures();sound('upgrade');toast(`Habilidad activada: ${item.name}`);return}const sell=e.target.closest('[data-sell-relic]');if(sell){const id=String(sell.dataset.sellRelic),r=state.relics.find(x=>String(x.id)===id);if(!r)return;state.relics=state.relics.filter(x=>String(x.id)!==id);state.equippedRelics=state.equippedRelics.filter(x=>String(x)!==id);state.money+=r.value;state.totalSales+=r.value;save();updateTop();renderTreasures();sound('sell');return}});$('sell-treasures').addEventListener('click',()=>{const ordinary=state.treasures||[],relics=state.relics||[],all=[...ordinary,...relics],total=all.reduce((n,t)=>n+(Number(t.value)||0),0),count=all.length;if(!count)return;state.treasures=[];state.relics=[];state.equippedRelics=[];state.money+=total;state.totalSales+=total;save();updateTop();renderTreasures();sound('sell');modal({icon:'💰',title:'Tesoros vendidos',desc:`Has vendido ${count} tesoros por ${cash(total)}.`,stats:[['Ingresos',cash(total)]],action:'Continuar'})});$('aquarium-list').addEventListener('click',e=>{const b=e.target.closest('[data-aquarium]');if(!b)return;const id=Number(b.dataset.aquarium);if(!state.discovered.includes(id)||!fish[id]||!aquariumRarityUnlocked(fish[id].rarity)||state.aquarium.includes(id)||state.aquarium.length>=aquariumCapacity())return;state.aquarium.push(id);save();renderAquarium();toast(`${fish[id].name} añadido a la pecera`)});$('aquarium-tank').addEventListener('click',e=>{const b=e.target.closest('[data-aquarium-info]');if(!b)return;const id=Number(b.dataset.aquariumInfo),f=fish[id];if(!f)return;modal({icon:f.emoji,title:f.name,eyebrow:rarities[f.rarity],desc:'Información del ejemplar expuesto en tu acuario.',stats:[['Rareza',rarities[f.rarity]],['Peso',f.weight+' kg'],['Valor de venta',cash(f.value)],['Ingresos diarios',cash(aquariumFishIncome(id))]],action:'Retirar del acuario',onAction:()=>{hideModal();state.aquarium=state.aquarium.filter(x=>x!==id);save();renderAquarium();toast(`${f.name} retirado de la pecera`)}})});$('aquarium-search').addEventListener('input',()=>{aquariumPage=0;renderAquarium()});$('mission-list').addEventListener('click',e=>{const b=e.target.closest('[data-mission]');if(b)claimMission(b.dataset.mission)});
 // Navigation and buttons
-$('begin').addEventListener('click',()=>{startMusic();state.hasStarted=true;save();sound('click');showScreen('menu')});$('brand-home').addEventListener('click',e=>{e.preventDefault();if(expeditionPausedForSettings){returnFromSettings();return}if(!sessionActive)showScreen(state.hasStarted?'menu':'intro')});$('settings-open').addEventListener('click',openSettings);$('leave-expedition').addEventListener('click',()=>{if(sessionActive)endFishing()});$('open-expedition-hold').addEventListener('click',openExpeditionHold);$('close-expedition-hold').addEventListener('click',closeExpeditionHold);$('go-fishing').addEventListener('click',startFishing);document.querySelectorAll('[data-screen]').forEach(b=>b.addEventListener('click',()=>{sound('click');showScreen(b.dataset.screen)}));document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>{sound('click');if(activeScreen==='settings')returnFromSettings();else showScreen('menu')}));$('zone-grid').addEventListener('click',e=>{const b=e.target.closest('[data-zone]');if(b){selectZone(Number(b.dataset.zone));renderZones()}});$('upgrade-grid').addEventListener('click',e=>{const rs=e.target.closest('[data-relic-storage-upgrade]');if(rs){openTreasureUpgradeDetail(Number(rs.dataset.relicStorageUpgrade));return}const aq=e.target.closest('[data-aquarium-upgrade]');if(aq){openAquariumUpgradeDetail(Number(aq.dataset.aquariumUpgrade));return}const wh=e.target.closest('[data-warehouse-upgrade]');if(wh){openWarehouseUpgradeDetail(Number(wh.dataset.warehouseUpgrade));return}const tab=e.target.closest('[data-branch]');if(tab){selectedSkillBranch=tab.dataset.branch;renderUpgrades();sound('click');return}const b=e.target.closest('[data-skill]');if(b)openSkillDetail(b.dataset.skill)});$('hold-list').addEventListener('click',e=>{const store=e.target.closest('[data-store]');if(store){storeToWarehouse(Number(store.dataset.store));return}const b=e.target.closest('[data-sell]');if(b)sellIndex(Number(b.dataset.sell))});$('warehouse-list')?.addEventListener('click',e=>{const u=e.target.closest('[data-unstore]');if(u){unstoreFromWarehouse(Number(u.dataset.unstore));return}const s=e.target.closest('[data-sell-warehouse]');if(s)sellWarehouseIndex(Number(s.dataset.sellWarehouse))});$('sell-all').addEventListener('click',sellAll);$('daily-mission-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-daily]');if(b)claimDailyMission(b.dataset.daily)});$('contract-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-deliver]');if(b)deliverContract(b.dataset.deliver)});$('story-mission-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-story]');if(b)claimStoryMission(b.dataset.story)});$('fish-search').addEventListener('input',()=>{bookPage=0;renderBook()});$('rarity-filter').addEventListener('change',()=>{bookPage=0;renderBook()});$('prev-page').addEventListener('click',()=>{bookPage--;renderBook()});$('next-page').addEventListener('click',()=>{bookPage++;renderBook()});$('cast-button').addEventListener('click',castLine);$('left-touch').addEventListener('pointerdown',e=>{e.preventDefault();keys.left=true});$('right-touch').addEventListener('pointerdown',e=>{e.preventDefault();keys.right=true});['pointerup','pointerleave','pointercancel'].forEach(ev=>{$('left-touch').addEventListener(ev,()=>{keys.left=false});$('right-touch').addEventListener(ev,()=>{keys.right=false})});document.addEventListener('keydown',e=>{if(!sessionActive)return;if(['a','A','d','D','e','E','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.key.toLowerCase()==='a'||e.key==='ArrowLeft')keys.left=true;if(e.key.toLowerCase()==='d'||e.key==='ArrowRight')keys.right=true;if(e.key.toLowerCase()==='e'||e.key===' ')castLine()});document.addEventListener('keyup',e=>{if(e.key.toLowerCase()==='a'||e.key==='ArrowLeft')keys.left=false;if(e.key.toLowerCase()==='d'||e.key==='ArrowRight')keys.right=false});$('sound-toggle').addEventListener('click',()=>{state.sound=!state.sound;save();renderSettings();if(state.sound)sound('click')});$('music-volume').addEventListener('input',e=>{state.musicVolume=Number(e.target.value);$('music-volume-value').textContent=state.musicVolume+' %';syncMusicVolume();save();if(music.paused&&state.musicVolume>0)startMusic()});$('effects-volume').addEventListener('input',e=>{state.effectsVolume=Number(e.target.value);$('effects-volume-value').textContent=state.effectsVolume+' %';save()});$('fullscreen').addEventListener('click',async()=>{try{if(!document.fullscreenElement)await $('app').requestFullscreen();else await document.exitFullscreen();$('fullscreen').textContent=document.fullscreenElement?'⛶ Salir de pantalla completa':'⛶ Activar'}catch(e){modal({icon:'⛶',title:'Pantalla completa no disponible',desc:'Tu navegador no permite pantalla completa en este contexto. Prueba a abrir la aplicación desde una pestaña normal.',action:'Entendido'})}});document.addEventListener('fullscreenchange',()=>$('fullscreen').textContent=document.fullscreenElement?'⛶ Salir de pantalla completa':'⛶ Activar');$('install-app').addEventListener('click',async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;renderSettings()});$('export-save').addEventListener('click',exportSave);$('import-save').addEventListener('click',()=>$('import-save-file').click());$('import-save-file').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(file)modal({icon:'📥',eyebrow:'IMPORTAR PARTIDA',title:'¿Sustituir tu progreso?',desc:'Se reemplazará la partida actual por el contenido del archivo seleccionado.',stats:[],action:'Importar partida',onAction:()=>{hideModal();importSaveFile(file);e.target.value=''}})});$('reset-game').addEventListener('click',()=>modal({icon:'⚠️',eyebrow:'BORRAR PROGRESO',title:'¿Reiniciar la partida?',desc:'Se perderán el dinero, las mejoras, las zonas desbloqueadas y todas las especies descubiertas. Esta acción no se puede deshacer.',stats:[],action:'Sí, reiniciar',onAction:async()=>{state=defaultState();expeditionPausedForSettings=false;expeditionPausedForHold=false;sessionActive=false;save();hideModal();showScreen('intro');updateTop();sound('click');toast('Partida reiniciada. Limpiando caché…');await clearAppCache()}}));$('modal-close').addEventListener('click',hideModal);$('modal').addEventListener('click',e=>{if(e.target===$('modal'))hideModal()});window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;renderSettings()});window.addEventListener('appinstalled',()=>{installPrompt=null;renderSettings()});
+$('begin').addEventListener('click',()=>{startMusic();state.hasStarted=true;save();sound('click');showScreen('menu')});$('brand-home').addEventListener('click',e=>{e.preventDefault();if(expeditionPausedForSettings){returnFromSettings();return}if(!sessionActive)showScreen(state.hasStarted?'menu':'intro')});$('settings-open').addEventListener('click',openSettings);$('leave-expedition').addEventListener('click',()=>{if(sessionActive)endFishing()});$('open-expedition-hold').addEventListener('click',openExpeditionHold);$('close-expedition-hold').addEventListener('click',closeExpeditionHold);$('go-fishing').addEventListener('click',startFishing);document.querySelectorAll('[data-screen]').forEach(b=>b.addEventListener('click',()=>{sound('click');showScreen(b.dataset.screen)}));document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>{sound('click');if(activeScreen==='settings')returnFromSettings();else showScreen('menu')}));$('zone-grid').addEventListener('click',e=>{const b=e.target.closest('[data-zone]');if(b){selectZone(Number(b.dataset.zone));renderZones()}});$('upgrade-grid').addEventListener('click',e=>{const rs=e.target.closest('[data-relic-storage-upgrade]');if(rs){openTreasureUpgradeDetail(Number(rs.dataset.relicStorageUpgrade));return}const aq=e.target.closest('[data-aquarium-upgrade]');if(aq){openAquariumUpgradeDetail(Number(aq.dataset.aquariumUpgrade));return}const wh=e.target.closest('[data-warehouse-upgrade]');if(wh){openWarehouseUpgradeDetail(Number(wh.dataset.warehouseUpgrade));return}const tab=e.target.closest('[data-branch]');if(tab){selectedSkillBranch=tab.dataset.branch;renderUpgrades();sound('click');return}const b=e.target.closest('[data-skill]');if(b)openSkillDetail(b.dataset.skill)});$('hold-list').addEventListener('click',e=>{const store=e.target.closest('[data-store]');if(store){storeToWarehouse(Number(store.dataset.store));return}const b=e.target.closest('[data-sell]');if(b)sellIndex(Number(b.dataset.sell))});$('warehouse-list')?.addEventListener('click',e=>{const u=e.target.closest('[data-unstore]');if(u){unstoreFromWarehouse(Number(u.dataset.unstore));return}const s=e.target.closest('[data-sell-warehouse]');if(s)sellWarehouseIndex(Number(s.dataset.sellWarehouse))});$('sell-all').addEventListener('click',sellAll);$('daily-mission-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-daily]');if(b)claimDailyMission(b.dataset.daily)});$('contract-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-deliver]');if(b)deliverContract(b.dataset.deliver)});$('story-mission-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-story]');if(b)claimStoryMission(b.dataset.story)});$('fish-search').addEventListener('input',()=>{bookPage=0;renderBook()});$('rarity-filter').addEventListener('change',()=>{bookPage=0;renderBook()});$('prev-page').addEventListener('click',()=>{bookPage--;renderBook()});$('next-page').addEventListener('click',()=>{bookPage++;renderBook()});$('cast-button').addEventListener('click',()=>{if(reelGame)tryReelHook();else castLine()});$('reel-hook')?.addEventListener('click',tryReelHook);$('left-touch').addEventListener('pointerdown',e=>{e.preventDefault();keys.left=true});$('right-touch').addEventListener('pointerdown',e=>{e.preventDefault();keys.right=true});['pointerup','pointerleave','pointercancel'].forEach(ev=>{$('left-touch').addEventListener(ev,()=>{keys.left=false});$('right-touch').addEventListener(ev,()=>{keys.right=false})});document.addEventListener('keydown',e=>{if(reelGame&&(e.key.toLowerCase()==='e'||e.key===' ')){e.preventDefault();tryReelHook();return}if(!sessionActive)return;if(['a','A','d','D','e','E','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.key.toLowerCase()==='a'||e.key==='ArrowLeft')keys.left=true;if(e.key.toLowerCase()==='d'||e.key==='ArrowRight')keys.right=true;if(e.key.toLowerCase()==='e'||e.key===' ')castLine()});document.addEventListener('keyup',e=>{if(e.key.toLowerCase()==='a'||e.key==='ArrowLeft')keys.left=false;if(e.key.toLowerCase()==='d'||e.key==='ArrowRight')keys.right=false});$('sound-toggle').addEventListener('click',()=>{state.sound=!state.sound;save();renderSettings();if(state.sound)sound('click')});$('music-toggle')?.addEventListener('click',()=>{state.musicEnabled=state.musicEnabled===false?true:false;save();renderSettings();if(state.musicEnabled)startMusic();else stopMusic();});$('music-volume').addEventListener('input',e=>{state.musicVolume=Number(e.target.value);$('music-volume-value').textContent=state.musicVolume+' %';syncMusicVolume();save();if(state.musicEnabled!==false&&music.paused&&state.musicVolume>0)startMusic()});$('effects-volume').addEventListener('input',e=>{state.effectsVolume=Number(e.target.value);$('effects-volume-value').textContent=state.effectsVolume+' %';save()});$('fullscreen').addEventListener('click',async()=>{try{if(!document.fullscreenElement)await $('app').requestFullscreen();else await document.exitFullscreen();$('fullscreen').textContent=document.fullscreenElement?'⛶ Salir de pantalla completa':'⛶ Activar'}catch(e){modal({icon:'⛶',title:'Pantalla completa no disponible',desc:'Tu navegador no permite pantalla completa en este contexto. Prueba a abrir la aplicación desde una pestaña normal.',action:'Entendido'})}});document.addEventListener('fullscreenchange',()=>$('fullscreen').textContent=document.fullscreenElement?'⛶ Salir de pantalla completa':'⛶ Activar');$('install-app').addEventListener('click',async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;renderSettings()});$('export-save').addEventListener('click',exportSave);$('import-save').addEventListener('click',()=>$('import-save-file').click());$('import-save-file').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(file)modal({icon:'📥',eyebrow:'IMPORTAR PARTIDA',title:'¿Sustituir tu progreso?',desc:'Se reemplazará la partida actual por el contenido del archivo seleccionado.',stats:[],action:'Importar partida',onAction:()=>{hideModal();importSaveFile(file);e.target.value=''}})});$('reset-game').addEventListener('click',()=>modal({icon:'⚠️',eyebrow:'BORRAR PROGRESO',title:'¿Reiniciar la partida?',desc:'Se perderán el dinero, las mejoras, las zonas desbloqueadas y todas las especies descubiertas. Esta acción no se puede deshacer.',stats:[],action:'Sí, reiniciar',onAction:async()=>{state=defaultState();expeditionPausedForSettings=false;expeditionPausedForHold=false;sessionActive=false;save();hideModal();showScreen('intro');updateTop();sound('click');toast('Partida reiniciada. Limpiando caché…');await clearAppCache()}}));$('modal-close').addEventListener('click',hideModal);$('modal').addEventListener('click',e=>{if(e.target===$('modal'))hideModal()});window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;renderSettings()});window.addEventListener('appinstalled',()=>{installPrompt=null;renderSettings()});
 // Installability, offline cache and start-up
 if('serviceWorker'in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
-normalizeTreasureAbilities();updateTop();if(state.hasStarted)showScreen('menu');else showScreen('intro');renderZones();renderUpgrades();renderBook();renderHold();renderSettings();renderBoat();renderTreasures();renderAquarium();ensureDailyContent();renderMissions();dailyWorld();startMusic();document.addEventListener('pointerdown',startMusic,{once:true});document.addEventListener('keydown',startMusic,{once:true});
+$('tutorial-next')?.addEventListener('click',()=>{sound('click');advanceTutorial()});$('tutorial-skip')?.addEventListener('click',()=>{sound('click');skipTutorial()});
+$('bait-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-buy-bait]');if(b){buyBait(b.dataset.buyBait);return}const eq=e.target.closest('[data-equip-bait]');if(eq)equipBait(eq.dataset.equipBait||null)});
+$('gacha-list')?.addEventListener('click',e=>{const g=e.target.closest('[data-gacha]');if(g)openGacha(Number(g.dataset.gacha));const s=e.target.closest('[data-gacha-secret]');if(s)openGacha(10)});
+$('go-night')?.addEventListener('click',()=>{if(sessionActive)return;state.isNight=true;save();startFishing();toast('🌙 Pesca nocturna')});
+setInterval(()=>{if(!state.stats)state.stats={};if(state.hasStarted)state.stats.playSeconds=(state.stats.playSeconds||0)+1},1000);
+
+normalizeTreasureAbilities();updateTop();if(state.hasStarted)showScreen('menu');else showScreen('intro');renderZones();renderUpgrades();renderBook();renderHold();renderSettings();renderBoat();renderTreasures();renderAquarium();ensureDailyContent();renderMissions();dailyWorld();checkAchievements();renderAchievements();startMusic();if(state.hasStarted&&!state.tutorialDone)renderTutorial();document.addEventListener('pointerdown',startMusic,{once:true});document.addEventListener('keydown',startMusic,{once:true});
 setInterval(()=>{if(activeScreen==='missions'){const el=$('daily-countdown');if(el)el.textContent=formatCountdown(msUntilMidnight());const lab=$('daily-reset-label');if(lab)lab.textContent='Reinicio a las 00:00 · queda '+formatCountdown(msUntilMidnight());ensureDailyContent()}},1000);
 })();
