@@ -248,7 +248,7 @@ kbd{background:#123;border:1px solid #456;border-radius:4px;padding:0 .35rem}
 .gacha-stage{margin-top:.35rem}
 .gacha-hero{border-radius:22px;overflow:hidden;border:1px solid #3d6a82;background:#081828;box-shadow:0 16px 50px #0007,inset 0 0 80px #1e90ff18}
 .gacha-hero-banner{height:clamp(140px,28vw,220px);background-size:cover;background-position:center top;background-repeat:no-repeat;position:relative}
-.gacha-hero-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,#081828cc 72%,#081828 100%)}
+.gacha-hero-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,#081828 100%)}
 .gacha-hero-body{padding:0 1.15rem 1.35rem;margin-top:-28px;position:relative;z-index:1;text-align:center}
 .gacha-kicker{display:inline-block;margin:0 0 .35rem;padding:.2rem .7rem;border-radius:999px;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:#1e3a5f;color:#7dd3fc;border:1px solid #3b82f655}
 .gacha-hero-body h2{margin:.15rem 0 .4rem;font-size:clamp(1.35rem,4vw,1.85rem);letter-spacing:-.02em;background:linear-gradient(180deg,#fff 20%,#fde68a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #0006)}
