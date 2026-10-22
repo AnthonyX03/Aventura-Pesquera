@@ -247,9 +247,10 @@ kbd{background:#123;border:1px solid #456;border-radius:4px;padding:0 .35rem}
 /* —— Gachapón decorado —— */
 .gacha-stage{margin-top:.35rem}
 .gacha-hero{border-radius:22px;overflow:hidden;border:1px solid #3d6a82;background:#081828;box-shadow:0 16px 50px #0007,inset 0 0 80px #1e90ff18}
-.gacha-hero-banner{height:clamp(140px,28vw,220px);background-size:cover;background-position:center top;background-repeat:no-repeat;position:relative}
-.gacha-hero-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,#081828 100%)}
-.gacha-hero-body{padding:0 1.15rem 1.35rem;margin-top:-28px;position:relative;z-index:1;text-align:center}
+.gacha-hero-banner{position:relative;width:100%;aspect-ratio:1168/784;max-height:min(52vh,420px);background:#061420;overflow:hidden}
+.gacha-hero-banner img,.gacha-hero-banner-img{display:block;width:100%;height:100%;object-fit:contain;object-position:center center;background:#061420}
+.gacha-hero-banner::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18%;background:linear-gradient(180deg,transparent,#081828ee);pointer-events:none}
+.gacha-hero-body{padding:1rem 1.15rem 1.35rem;margin-top:0;position:relative;z-index:1;text-align:center;border-top:1px solid #1e3a4a}
 .gacha-kicker{display:inline-block;margin:0 0 .35rem;padding:.2rem .7rem;border-radius:999px;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:#1e3a5f;color:#7dd3fc;border:1px solid #3b82f655}
 .gacha-hero-body h2{margin:.15rem 0 .4rem;font-size:clamp(1.35rem,4vw,1.85rem);letter-spacing:-.02em;background:linear-gradient(180deg,#fff 20%,#fde68a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #0006)}
 .event-machine .gacha-hero-body h2{background:linear-gradient(180deg,#fff,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -276,7 +277,54 @@ kbd{background:#123;border:1px solid #456;border-radius:4px;padding:0 .35rem}
 .gacha-cta.treasure{background:linear-gradient(180deg,#fef3c7,#d97706);color:#451a03;box-shadow:0 6px 0 #92400e,0 12px 28px #d9770655}
 .gacha-footnote{margin:.65rem 0 0;font-size:.78rem;color:#7a9bb0}
 @media(max-width:640px){
-  .gacha-hero-banner{height:120px}
+  .gacha-hero-banner{max-height:min(42vh,320px)}
   .gacha-globe{max-width:200px;padding:.4rem}
   .gacha-globe span{font-size:1.15rem}
+}
+
+/* —— Layout móvil más holgado —— */
+@supports(padding: max(0px)){
+  body{padding-left:max(0px,env(safe-area-inset-left));padding-right:max(0px,env(safe-area-inset-right));padding-bottom:max(0px,env(safe-area-inset-bottom))}
+}
+@media (max-width:700px){
+  #app{padding:0 16px 24px;max-width:100%}
+  .topbar{height:auto;min-height:64px;padding:10px 0 8px;flex-wrap:wrap;gap:8px}
+  .top-stats{gap:10px;font-size:12px;flex-wrap:wrap}
+  .screen{padding:16px 0 32px}
+  .welcome{margin-bottom:12px;gap:12px}
+  .intro-screen{grid-template-columns:1fr;gap:20px;min-height:0}
+  .intro-art{height:200px}
+  .menu-hero{margin-bottom:16px;padding:14px!important;border-radius:18px}
+  .menu-hero .hero-text{padding:4px 2px 8px}
+  .menu-hero .primary.big,.menu-hero .secondary.big{width:100%;max-width:100%;justify-content:center;margin:6px 0 0!important;min-height:48px}
+  #go-night{margin-top:8px!important}
+  .dashboard-grid,.dash-grid,.menu-grid,#menu .feature-grid,.menu .grid{
+    gap:12px!important;
+    margin-top:4px;
+  }
+  #menu .dash-card,#menu .feature-card,#menu button.dash-card,.dash-card{
+    padding:14px 12px!important;
+    min-height:78px;
+    border-radius:16px;
+    gap:10px;
+  }
+  .dash-card .dash-icon{width:42px;height:42px;font-size:1.25rem}
+  .dash-card b{font-size:.92rem}
+  .dash-card small{font-size:.72rem;line-height:1.3}
+
+  .page-heading{margin-bottom:14px;gap:10px}
+  .page-heading h1{font-size:1.45rem}
+  .zone-grid{gap:12px}
+  .zone-card{padding:12px}
+  .mission-tabs{gap:8px;margin-bottom:12px}
+  .mission-tab{padding:.7rem .8rem;font-size:.85rem}
+  .gacha-hero-body{padding:1rem .9rem 1.2rem}
+  .fishing-controls{padding:8px 4px 12px;gap:12px}
+  .touch-control button{width:56px;height:56px}
+  footer{padding:12px 0 20px}
+}
+@media (max-width:400px){
+  #app{padding:0 10px 16px}
+  .top-stats{font-size:11px}
+  #menu .dash-card{padding:12px 10px!important}
 }
