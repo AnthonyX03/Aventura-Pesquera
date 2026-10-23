@@ -221,14 +221,20 @@ function addZoneCatch(z){if(!state.zoneMastery)state.zoneMastery={};state.zoneMa
 function petBonus(key){const p=BOAT_PETS.find(x=>x.id===state.boatPet);return p&&p.buff&&p.buff[key]||0}
 function tryGiftCode(code){
  code=(code||'').trim().toUpperCase();
+ if(!code){toast('Escribe un código');return false}
  const g=GIFT_CODES[code];
- if(!g){toast('Código no válido');return false}
- if((state.giftCodes||[]).includes(code)){toast('Este código ya se usó');return false}
+ if(!g){modal({icon:'❌',eyebrow:'CÓDIGO',title:'Código no válido',desc:'Ese código no existe o está mal escrito. Comprueba las letras y vuelve a intentarlo.',action:'Entendido'});return false}
+ if((state.giftCodes||[]).includes(code)){modal({icon:'ℹ️',eyebrow:'CÓDIGO',title:'Ya canjeado',desc:'Este código ya se usó en esta partida.',action:'Entendido'});return false}
  if(!state.giftCodes)state.giftCodes=[];
  state.giftCodes.push(code);
- if(g.tickets){Object.entries(g.tickets).forEach(([k,v])=>addTicket(k,v))}
- if(g.money)state.money+=g.money;
- save();updateTop();renderGacha();toast(g.msg||'¡Código canjeado!');return true;
+ const got=[];
+ const labels={fish:'Fichas de peces',event:'Fichas de evento',treasure:'Fichas de tesoro'};
+ if(g.tickets){Object.entries(g.tickets).forEach(([k,v])=>{addTicket(k,v);got.push(['🎟️ '+labels[k]||k,String(v)])})}
+ if(g.money){state.money+=g.money;got.push(['💰 Dinero',cash(g.money)])}
+ if(g.bait){if(!state.baits)state.baits={};state.baits[g.bait]=(state.baits[g.bait]||0)+(g.baitQty||1);got.push(['🪱 Cebo','×'+(g.baitQty||1)])}
+ save();updateTop();renderGacha();renderStats();
+ modal({icon:'🎁',eyebrow:'CÓDIGO CANJEADO',title:'¡Regalo recibido!',desc:g.msg||'Has canjeado el código correctamente.',stats:got,action:'¡Genial!'});
+ return true;
 }
 function pushLogbookWeekly(){
  if(!state.logbook)state.logbook=[];
@@ -1131,7 +1137,7 @@ function renderStats(){
  <h3 class="section-title">📖 Bitácora semanal</h3>
  <ul class="logbook-list">${log}</ul>
  <h3 class="section-title">🎁 Código de regalo</h3>
- <div class="gift-row"><input id="gift-code-input" placeholder="CAPITAN2026" maxlength="24"><button class="primary" id="gift-code-btn">Canjear</button></div>
+ <div class="gift-row"><input id="gift-code-input" placeholder="Introduce tu código" maxlength="24" autocomplete="off" autocapitalize="characters"><button class="primary" id="gift-code-btn">Canjear</button></div>
  `;
 }
 
