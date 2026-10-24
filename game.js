@@ -220,22 +220,48 @@ function zoneMasteryBonus(z){return Math.floor(zoneMasteryLevel(z)/100)*0.05}
 function addZoneCatch(z){if(!state.zoneMastery)state.zoneMastery={};state.zoneMastery[z]=(state.zoneMastery[z]||0)+1;const m=state.zoneMastery[z];if(m%100===0)toast(`🏅 Maestría zona ${z+1}: +5 % valor permanente (${m} capturas)`)}
 function petBonus(key){const p=BOAT_PETS.find(x=>x.id===state.boatPet);return p&&p.buff&&p.buff[key]||0}
 function tryGiftCode(code){
- code=(code||'').trim().toUpperCase();
+ code=String(code||'').trim().toUpperCase();
  if(!code){toast('Escribe un código');return false}
  const g=GIFT_CODES[code];
- if(!g){modal({icon:'❌',eyebrow:'CÓDIGO',title:'Código no válido',desc:'Ese código no existe o está mal escrito. Comprueba las letras y vuelve a intentarlo.',action:'Entendido'});return false}
- if((state.giftCodes||[]).includes(code)){modal({icon:'ℹ️',eyebrow:'CÓDIGO',title:'Ya canjeado',desc:'Este código ya se usó en esta partida.',action:'Entendido'});return false}
+ if(!g){
+  modal({icon:'❌',eyebrow:'CÓDIGO',title:'Código no válido',desc:'Ese código no existe o está mal escrito.',stats:[],action:'Entendido'});
+  return false;
+ }
+ if((state.giftCodes||[]).includes(code)){
+  modal({icon:'ℹ️',eyebrow:'CÓDIGO',title:'Ya canjeado',desc:'Este código ya se usó en esta partida.',stats:[],action:'Entendido'});
+  return false;
+ }
  if(!state.giftCodes)state.giftCodes=[];
  state.giftCodes.push(code);
- const got=[];
+ const stats=[];
  const labels={fish:'Fichas de peces',event:'Fichas de evento',treasure:'Fichas de tesoro'};
- if(g.tickets){Object.entries(g.tickets).forEach(([k,v])=>{addTicket(k,v);got.push(['🎟️ '+labels[k]||k,String(v)])})}
- if(g.money){state.money+=g.money;got.push(['💰 Dinero',cash(g.money)])}
- if(g.bait){if(!state.baits)state.baits={};state.baits[g.bait]=(state.baits[g.bait]||0)+(g.baitQty||1);got.push(['🪱 Cebo','×'+(g.baitQty||1)])}
- save();updateTop();renderGacha();renderStats();
- modal({icon:'🎁',eyebrow:'CÓDIGO CANJEADO',title:'¡Regalo recibido!',desc:g.msg||'Has canjeado el código correctamente.',stats:got,action:'¡Genial!'});
+ if(g.tickets){
+  Object.keys(g.tickets).forEach(k=>{
+   const v=Number(g.tickets[k])||0;
+   if(v>0){addTicket(k,v);stats.push([labels[k]||k,'+'+v]);}
+  });
+ }
+ if(g.money){state.money+=g.money;stats.push(['Dinero',cash(g.money)]);}
+ if(g.bait){if(!state.baits)state.baits={};const q=g.baitQty||1;state.baits[g.bait]=(state.baits[g.bait]||0)+q;stats.push(['Cebo','+'+q]);}
+ save();updateTop();
+ try{renderGacha()}catch(e){}
+ const input=$('gift-code-input');if(input)input.value='';
+ const descLines=stats.length?('Has obtenido:\n'+stats.map(s=>s[0]+': '+s[1]).join('\n')):(g.msg||'Código canjeado.');
+ // modal after DOM updates
+ setTimeout(()=>{
+  modal({
+   icon:'🎁',
+   eyebrow:'CÓDIGO CANJEADO',
+   title:'¡Regalo recibido!',
+   desc:descLines,
+   stats:stats,
+   action:'¡Genial!',
+   onAction:()=>{hideModal();try{renderStats()}catch(e){}}
+  });
+ },30);
  return true;
 }
+
 function pushLogbookWeekly(){
  if(!state.logbook)state.logbook=[];
  const week=Math.floor(Date.now()/604800000);
@@ -272,7 +298,73 @@ merged.tutorialDone=Boolean(s.tutorialDone);
 return merged}}catch(e){}return defaultState()}
 function save(){try{localStorage.setItem('aventuraPesqueraSave',JSON.stringify(state))}catch(e){}}
 function exportSave(){try{const payload={app:'Aventura Pesquera',version:1,exportedAt:new Date().toISOString(),save:state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`aventura-pesquera-partida-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Partida exportada correctamente')}catch(e){modal({icon:'⚠️',title:'No se pudo exportar',desc:'Tu navegador no ha podido crear el archivo de la partida.',action:'Entendido'})}}
-function importSaveFile(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const parsed=JSON.parse(String(reader.result||''));const candidate=parsed&&parsed.save?parsed.save:parsed;if(!candidate||typeof candidate!=='object'||Array.isArray(candidate)||!Array.isArray(candidate.hold)||!Array.isArray(candidate.discovered)||!Array.isArray(candidate.unlocked)||!Array.isArray(candidate.skillNodes)||!Number.isFinite(Number(candidate.money))||!Number.isFinite(Number(candidate.day)))throw new Error('invalid save');const clean={...defaultState(),...candidate};clean.money=Math.max(0,Number(clean.money)||0);clean.day=Math.max(1,Math.floor(Number(clean.day)||1));clean.zone=Math.max(0,Math.min(zones.length-1,Math.floor(Number(clean.zone)||0)));clean.unlocked=[...new Set(clean.unlocked.map(Number).filter(n=>Number.isInteger(n)&&n>=0&&n<zones.length))];if(!clean.unlocked.includes(0))clean.unlocked.unshift(0);if(!clean.unlocked.includes(clean.zone))clean.zone=0;clean.treasures=Array.isArray(clean.treasures)?clean.treasures.filter(t=>t&&typeof t.name==='string'&&Number.isFinite(Number(t.value))).map(t=>({...t,value:Math.max(0,Number(t.value)||0)})):[];clean.aquarium=Array.isArray(clean.aquarium)?[...new Set(clean.aquarium.map(Number).filter(id=>Number.isInteger(id)&&id>=0&&id<fish.length))].slice(0,10):[];clean.aquariumLevel=Math.max(1,Math.min(10,Math.floor(Number(candidate.aquariumLevel)||Math.min(10,Math.max(1,clean.aquarium.length||1)))));clean.aquariumUpgrades=Array.isArray(candidate.aquariumUpgrades)?[...new Set(clean.aquariumUpgrades.filter(id=>Number.isInteger(id)&&id>=0&&id<30))].sort((a,b)=>a-b):Array.from({length:Math.min(30,Math.max(0,Math.min(10,Math.floor(Number(candidate.aquariumLevel)||1)-1)*3))},(_,i)=>i);clean.aquarium=clean.aquarium.slice(0,aquariumCapacityFor(clean.aquariumUpgrades));clean.completedMissions=Array.isArray(clean.completedMissions)?clean.completedMissions.filter(id=>typeof id==='string'&&missionDefs.some(m=>m.id===id)):[];clean._contractsDone=Math.max(0,Math.floor(Number(candidate._contractsDone)||0));clean.boatSkin=Math.max(0,Math.min(4,Math.floor(Number(clean.boatSkin)||0)));clean.tournamentClaimed=Boolean(clean.tournamentClaimed);clean.hold=clean.hold.map(Number).filter(id=>Number.isInteger(id)&&id>=0&&id<fish.length);clean.discovered=[...new Set(clean.discovered.map(Number).filter(id=>Number.isInteger(id)&&id>=0&&id<fish.length))];clean.skillNodes=[...new Set(clean.skillNodes.filter(id=>typeof id==='string'&&SKILLS.some(skill=>skill.id===id)))];clean.sound=Boolean(clean.sound);clean.musicVolume=Math.max(0,Math.min(100,Number(clean.musicVolume)||0));clean.effectsVolume=Math.max(0,Math.min(100,Number(clean.effectsVolume)||0));clean.hasStarted=Boolean(clean.hasStarted);clean.totalCaught=Math.max(0,Number(clean.totalCaught)||0);clean.totalSales=Math.max(0,Number(clean.totalSales)||0);state=clean;save();updateTop();renderMenu();renderZones();renderUpgrades();renderBook();renderHold();renderSettings();syncMusicVolume();toast('Partida importada correctamente');showScreen(state.hasStarted?'menu':'intro')}catch(e){modal({icon:'⚠️',title:'Archivo no válido',desc:'El archivo no parece una partida válida de Aventura Pesquera. No se ha cambiado tu progreso.',action:'Entendido'})}};reader.onerror=()=>modal({icon:'⚠️',title:'Error al leer el archivo',desc:'No se ha podido leer el archivo seleccionado.',action:'Entendido'});reader.readAsText(file)}
+function importSaveFile(file){
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   let text=String(reader.result||'').replace(/^\uFEFF/,'');
+   const parsed=JSON.parse(text);
+   // Accept {app, save} or raw state
+   let candidate=parsed&&typeof parsed==='object'?(parsed.save&&typeof parsed.save==='object'?parsed.save:parsed):null;
+   if(!candidate||typeof candidate!=='object'||Array.isArray(candidate)){
+    throw new Error('invalid save');
+   }
+   // Normalize arrays that older/newer saves may omit
+   const asArr=v=>Array.isArray(v)?v:[];
+   const money=Number(candidate.money);
+   const day=Number(candidate.day);
+   // Must look like a game save: money or day present, or unlocked/hold/discovered
+   const hasSignal=Number.isFinite(money)||Number.isFinite(day)||Array.isArray(candidate.unlocked)||Array.isArray(candidate.hold)||Array.isArray(candidate.discovered);
+   if(!hasSignal)throw new Error('invalid save');
+
+   const clean={...defaultState(),...candidate};
+   clean.money=Math.max(0,Number.isFinite(Number(clean.money))?Number(clean.money):0);
+   clean.day=Math.max(1,Math.floor(Number(clean.day)||1));
+   clean.zone=Math.max(0,Math.min(zones.length-1,Math.floor(Number(clean.zone)||0)));
+   clean.unlocked=[...new Set(asArr(clean.unlocked).map(Number).filter(n=>Number.isInteger(n)&&n>=0&&n<zones.length))];
+   if(!clean.unlocked.includes(0))clean.unlocked.unshift(0);
+   if(!clean.unlocked.includes(clean.zone))clean.zone=clean.unlocked[0]||0;
+   clean.hold=asArr(clean.hold).map(Number).filter(id=>Number.isInteger(id)&&id>=0&&id<fish.length);
+   clean.discovered=[...new Set(asArr(clean.discovered).map(Number).filter(id=>Number.isInteger(id)&&id>=0&&id<fish.length))];
+   clean.skillNodes=[...new Set(asArr(clean.skillNodes).filter(id=>typeof id==='string'))];
+   clean.warehouse=asArr(clean.warehouse).map(Number).filter(id=>Number.isInteger(id)&&id>=0&&id<fish.length);
+   clean.treasures=asArr(clean.treasures).filter(t=>t&&typeof t==='object');
+   clean.relics=asArr(clean.relics).filter(t=>t&&typeof t==='object');
+   clean.equippedRelics=asArr(clean.equippedRelics);
+   clean.aquarium=asArr(clean.aquarium).map(Number).filter(id=>Number.isInteger(id)&&id>=0&&id<fish.length);
+   clean.completedMissions=asArr(clean.completedMissions);
+   clean.giftCodes=asArr(clean.giftCodes);
+   clean.gachaTickets=clean.gachaTickets&&typeof clean.gachaTickets==='object'?clean.gachaTickets:{fish:0,event:0,treasure:0};
+   clean.baits=clean.baits&&typeof clean.baits==='object'?clean.baits:{};
+   clean.zoneMastery=clean.zoneMastery&&typeof clean.zoneMastery==='object'?clean.zoneMastery:{};
+   clean.stats=clean.stats&&typeof clean.stats==='object'?clean.stats:(defaultState().stats||{});
+   clean.records=clean.records&&typeof clean.records==='object'?clean.records:(defaultState().records||{});
+   clean.logbook=asArr(clean.logbook);
+   clean.sound=clean.sound!==false;
+   clean.musicEnabled=clean.musicEnabled!==false;
+   clean.musicVolume=Math.max(0,Math.min(100,Number(clean.musicVolume)||35));
+   clean.effectsVolume=Math.max(0,Math.min(100,Number(clean.effectsVolume)||70));
+   clean.hasStarted=Boolean(clean.hasStarted);
+   clean.totalCaught=Math.max(0,Number(clean.totalCaught)||0);
+   clean.totalSales=Math.max(0,Number(clean.totalSales)||0);
+   clean.captainXp=Math.max(0,Number(clean.captainXp)||0);
+   state=clean;
+   save();
+   updateTop();
+   try{renderMenu();renderZones();renderUpgrades();renderBook();renderHold();renderSettings();renderTreasures();renderAquarium();renderMissions();renderStats();renderGacha();syncMusicVolume()}catch(err){console.warn(err)}
+   toast('Partida importada correctamente');
+   showScreen(state.hasStarted?'menu':'intro');
+   modal({icon:'✅',eyebrow:'IMPORTAR',title:'Partida importada',desc:'Tu progreso se ha cargado correctamente.',stats:[['Día',String(state.day)],['Dinero',cash(state.money)],['Zona',String((state.zone||0)+1)]],action:'Continuar'});
+  }catch(e){
+   console.warn('importSaveFile',e);
+   modal({icon:'⚠️',title:'Archivo no válido',desc:'No se pudo leer como partida de Aventura Pesquera. Comprueba que sea el JSON exportado desde Ajustes. Tu partida actual no se ha modificado.',action:'Entendido'});
+  }
+ };
+ reader.onerror=()=>modal({icon:'⚠️',title:'Error al leer el archivo',desc:'No se ha podido leer el archivo seleccionado.',action:'Entendido'});
+ reader.readAsText(file);
+}
+
 async function clearAppCache(){try{if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(key=>key.startsWith('aventura-pesquera')).map(key=>caches.delete(key)))}}catch(e){}try{if('serviceWorker'in navigator){const registrations=await navigator.serviceWorker.getRegistrations();await Promise.all(registrations.map(registration=>registration.unregister()))}}catch(e){}try{if(location.protocol==='https:'||location.protocol==='http:'){const url=new URL(location.href);url.searchParams.set('refresh',String(Date.now()));location.replace(url.href)}else location.reload()}catch(e){try{location.reload()}catch(_){}}}
 function cash(n){return Math.round(n).toLocaleString('es-ES')+' €'}
 function hasSkill(id){return (state.skillNodes||[]).includes(id)}
@@ -1321,7 +1413,7 @@ document.querySelector('.weather-badge')?.addEventListener('click',()=>{sound('c
 document.body.addEventListener('click',e=>{
  const pet=e.target.closest('[data-pet]');
  if(pet){state.boatPet=pet.dataset.pet;save();renderStats();toast('Mascota equipada');sound('click');return}
- if(e.target.id==='gift-code-btn'||e.target.closest('#gift-code-btn')){tryGiftCode($('gift-code-input')?.value);return}
+ if(e.target.id==='gift-code-btn'||e.target.closest('#gift-code-btn')){e.preventDefault();e.stopPropagation();tryGiftCode(($('gift-code-input')||{}).value||'');return}
 });
 
 document.querySelector('.weather-badge')?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openWeatherInfo()}});
