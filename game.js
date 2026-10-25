@@ -1,6 +1,6 @@
 (() => {
 'use strict';
-const $=id=>document.getElementById(id), screens=['intro','menu','fishing','zones','upgrades','encyclopedia','hold','settings','boat','treasures','aquarium','missions','achievements','gacha','stats','baits'];
+const $=id=>document.getElementById(id), screens=['intro','menu','fishing','zones','upgrades','encyclopedia','hold','settings','rewards','boat','treasures','aquarium','missions','achievements','gacha','stats','baits'];
 const zones=[
 {name:'Costa tranquila',emoji:'🏝️',desc:'Aguas poco profundas, ideales para empezar.',price:0,depth:'0–30 m',color:['#a0e7df','#1c91a8'],pool:[0,1,2,3,4,5,6,7,8,9,10,11],bonus:1},
 {name:'Bahía de coral',emoji:'🪸',desc:'Arrecifes coloridos llenos de especies curiosas.',price:4500,depth:'20–90 m',color:['#9de1d0','#177d9b'],pool:[4,5,14,15,16,17,18,19,20,34,44,50],bonus:1.25},
@@ -221,44 +221,27 @@ function addZoneCatch(z){if(!state.zoneMastery)state.zoneMastery={};state.zoneMa
 function petBonus(key){const p=BOAT_PETS.find(x=>x.id===state.boatPet);return p&&p.buff&&p.buff[key]||0}
 function tryGiftCode(code){
  code=String(code||'').trim().toUpperCase();
- if(!code){toast('Escribe un código');return false}
+ const box=$('rewards-feedback');
+ const show=(icon,title,desc,stats)=>{
+  const html=`<div class="rewards-feedback-card"><div class="rf-icon">${icon}</div><b>${title}</b><p>${desc.replace(/\n/g,'<br>')}</p>${stats&&stats.length?`<ul>${stats.map(s=>`<li><span>${s[0]}</span><strong>${s[1]}</strong></li>`).join('')}</ul>`:''}</div>`;
+  if(box){box.innerHTML=html;box.classList.remove('hidden')}
+  else toast(title+': '+desc);
+ };
+ if(!code){show('✏️','Código vacío','Escribe un código para canjearlo.',[]);return false}
  const g=GIFT_CODES[code];
- if(!g){
-  modal({icon:'❌',eyebrow:'CÓDIGO',title:'Código no válido',desc:'Ese código no existe o está mal escrito.',stats:[],action:'Entendido'});
-  return false;
- }
- if((state.giftCodes||[]).includes(code)){
-  modal({icon:'ℹ️',eyebrow:'CÓDIGO',title:'Ya canjeado',desc:'Este código ya se usó en esta partida.',stats:[],action:'Entendido'});
-  return false;
- }
+ if(!g){show('❌','Código no válido','Ese código no existe o está mal escrito.',[]);return false}
+ if((state.giftCodes||[]).includes(code)){show('ℹ️','Ya canjeado','Este código ya se usó en esta partida.',[]);return false}
  if(!state.giftCodes)state.giftCodes=[];
  state.giftCodes.push(code);
  const stats=[];
  const labels={fish:'Fichas de peces',event:'Fichas de evento',treasure:'Fichas de tesoro'};
- if(g.tickets){
-  Object.keys(g.tickets).forEach(k=>{
-   const v=Number(g.tickets[k])||0;
-   if(v>0){addTicket(k,v);stats.push([labels[k]||k,'+'+v]);}
-  });
- }
- if(g.money){state.money+=g.money;stats.push(['Dinero',cash(g.money)]);}
- if(g.bait){if(!state.baits)state.baits={};const q=g.baitQty||1;state.baits[g.bait]=(state.baits[g.bait]||0)+q;stats.push(['Cebo','+'+q]);}
+ if(g.tickets){Object.keys(g.tickets).forEach(k=>{const v=Number(g.tickets[k])||0;if(v>0){addTicket(k,v);stats.push([labels[k]||k,'+'+v])}})}
+ if(g.money){state.money+=g.money;stats.push(['Dinero',cash(g.money)])}
+ if(g.bait){if(!state.baits)state.baits={};const q=g.baitQty||1;state.baits[g.bait]=(state.baits[g.bait]||0)+q;stats.push(['Cebo','+'+q])}
  save();updateTop();
  try{renderGacha()}catch(e){}
  const input=$('gift-code-input');if(input)input.value='';
- const descLines=stats.length?('Has obtenido:\n'+stats.map(s=>s[0]+': '+s[1]).join('\n')):(g.msg||'Código canjeado.');
- // modal after DOM updates
- setTimeout(()=>{
-  modal({
-   icon:'🎁',
-   eyebrow:'CÓDIGO CANJEADO',
-   title:'¡Regalo recibido!',
-   desc:descLines,
-   stats:stats,
-   action:'¡Genial!',
-   onAction:()=>{hideModal();try{renderStats()}catch(e){}}
-  });
- },30);
+ show('🎁','¡Regalo recibido!',g.msg||'Has canjeado el código correctamente.',stats);
  return true;
 }
 
@@ -443,29 +426,107 @@ function claimWeeklyMission(id){
  if((m.progress||0)<m.goal)return;
  m.claimed=true;state.money+=m.reward;addCaptainXp(8);addTicket('fish',2);addTicket('event',1);addTicket('treasure',1);save();updateTop();renderMissions();renderGacha();showMissionCompleteFx();toast(`Semanal: +${cash(m.reward)} · 🎟️ fichas`);
 }
-function maybeDailyLogin(){
+function msUntilNextLogin(){
+ const now=new Date();
+ const next=new Date(now);next.setHours(24,0,0,0);
+ return Math.max(0,next-now);
+}
+function dailyRewardAvailable(){return (state.loginDate||'')!==todayKey()}
+function previewDailyReward(){
  const key=todayKey();
- if(state.loginDate===key)return;
- const prev=state.loginDate;
  let streak=state.loginStreak||0;
+ const prev=state.loginDate;
  if(prev){
   const p=new Date(prev+'T12:00:00'),n=new Date(key+'T12:00:00');
   const diff=Math.round((n-p)/86400000);
-  streak=diff===1?Math.min(7,streak+1):1;
+  streak=diff===1?Math.min(7,(streak||0)+1):(diff===0?Math.max(1,streak||1):1);
  } else streak=1;
- state.loginStreak=streak;
- state.loginDate=key;
- const day=streak; // 1..7
- const rewards=[];
+ const day=streak;
+ const list=[];
  const money=50*day+day*day*15;
- state.money+=money;rewards.push(`💰 ${cash(money)}`);
- addTicket('fish',day>=3?2:1);rewards.push(`🎟️ Ficha pez ×${day>=3?2:1}`);
- if(day>=2){addTicket('treasure',1);rewards.push('🎟️ Ficha tesoro')}
- if(day>=4){addTicket('event',1);rewards.push('🎟️ Ficha evento')}
- if(day>=5){const b=BAITS[Math.min(BAITS.length-1,day-2)];if(!state.baits)state.baits={};state.baits[b.id]=(state.baits[b.id]||0)+1;rewards.push(`${b.emoji} ${b.name}`)}
- if(day>=7){addTicket('fish',3);addTicket('event',2);addTicket('treasure',2);rewards.push('🎁 Bonus día 7: +3/+2/+2 fichas');state.loginStreak=0}
- save();updateTop();renderGacha();
- setTimeout(()=>modal({icon:'🎁',eyebrow:'RACHA DE LOGIN',title:`Día ${day} de 7`,desc:rewards.join('\n'),stats:[['Racha',`${day}/7`]],action:'¡Genial!'}),400);
+ list.push(['💰 Dinero',cash(money)]);
+ list.push(['🎟️ Fichas de peces','+'+(day>=3?2:1)]);
+ if(day>=2)list.push(['🎟️ Fichas de tesoro','+1']);
+ if(day>=4)list.push(['🎟️ Fichas de evento','+1']);
+ if(day>=5){const b=BAITS[Math.min(BAITS.length-1,day-2)];list.push([b.emoji+' '+b.name,'+1'])}
+ if(day>=7)list.push(['🎁 Bonus día 7','+3/+2/+2 fichas']);
+ return {day,list,money,streak:day};
+}
+function claimDailyReward(){
+ if(!dailyRewardAvailable()){toast('Ya reclamaste la recompensa de hoy');return false}
+ const prev=previewDailyReward();
+ const day=prev.day;
+ state.loginStreak=day>=7?0:day;
+ state.loginDate=todayKey();
+ state.money+=prev.money;
+ addTicket('fish',day>=3?2:1);
+ if(day>=2)addTicket('treasure',1);
+ if(day>=4)addTicket('event',1);
+ if(day>=5){const b=BAITS[Math.min(BAITS.length-1,day-2)];if(!state.baits)state.baits={};state.baits[b.id]=(state.baits[b.id]||0)+1}
+ if(day>=7){addTicket('fish',3);addTicket('event',2);addTicket('treasure',2)}
+ window._lastDailyClaim=prev;
+ save();updateTop();
+ try{renderGacha()}catch(e){}
+ renderRewards('daily-claimed');
+ return true;
+}
+
+
+function renderRewards(flash){
+ const root=$('rewards-panel');if(!root)return;
+ const avail=dailyRewardAvailable();
+ const prev=previewDailyReward();
+ const streak=state.loginStreak||0;
+ let dailyBlock='';
+ if(avail){
+  dailyBlock=`<article class="reward-card reward-available">
+   <div class="reward-head"><span>📅</span><div><b>Recompensa diaria</b><small>Día ${prev.day} de 7 · Racha actual</small></div></div>
+   <ul class="reward-list">${prev.list.map(s=>`<li><span>${s[0]}</span><strong>${s[1]}</strong></li>`).join('')}</ul>
+   <button type="button" class="primary big" id="claim-daily-btn">🎁 Reclamar recompensa</button>
+  </article>`;
+ } else {
+  dailyBlock=`<article class="reward-card">
+   <div class="reward-head"><span>✅</span><div><b>Recompensa diaria reclamada</b><small>Racha: ${streak||'—'} / 7</small></div></div>
+   <p class="reward-timer">Próxima recompensa en <b id="rewards-countdown">${formatCountdown(msUntilNextLogin())}</b></p>
+  </article>`;
+ }
+ if(flash==='daily-claimed'){
+  const claimed=window._lastDailyClaim||prev;
+  dailyBlock=`<article class="reward-card reward-claimed-flash">
+   <div class="reward-head"><span>🎉</span><div><b>¡Recompensa reclamada!</b><small>Día ${claimed.day} de 7</small></div></div>
+   <ul class="reward-list">${(claimed.list||[]).map(s=>`<li><span>${s[0]}</span><strong>${s[1]}</strong></li>`).join('')}</ul>
+   <p class="reward-timer">Próxima en <b id="rewards-countdown">${formatCountdown(msUntilNextLogin())}</b></p>
+  </article>`;
+ }
+ root.innerHTML=`
+  ${dailyBlock}
+  <article class="reward-card">
+   <div class="reward-head"><span>🎁</span><div><b>Código de regalo</b><small>Introduce un código válido de una sola vez</small></div></div>
+   <div class="gift-row"><input id="gift-code-input" placeholder="Introduce tu código" maxlength="24" autocomplete="off" autocapitalize="characters"><button type="button" class="primary" id="gift-code-btn">Canjear</button></div>
+   <div id="rewards-feedback" class="rewards-feedback ${flash&&flash!=='daily-claimed'?'':'hidden'}"></div>
+  </article>
+ `;
+ // bind
+ const claim=$('claim-daily-btn');
+ if(claim)claim.onclick=()=>{claimDailyReward();sound('upgrade')};
+ const gbtn=$('gift-code-btn');
+ if(gbtn)gbtn.onclick=()=>{tryGiftCode(($('gift-code-input')||{}).value||'');sound('click')};
+ const gin=$('gift-code-input');
+ if(gin)gin.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();tryGiftCode(gin.value)}});
+ updateRewardsBadge();
+}
+function updateRewardsBadge(){
+ const btn=$('rewards-open');if(!btn)return;
+ if(dailyRewardAvailable()&&state.hasStarted)btn.classList.add('has-reward');
+ else btn.classList.remove('has-reward');
+}
+
+function maybeDailyLogin(){
+ // Ya no auto-reclama ni muestra modal; solo avisa con toast suave si hay recompensa
+ if(dailyRewardAvailable()&&state.hasStarted){
+  const tip=document.querySelector('.daily-tip');
+  // badge on rewards button handled in updateTop
+ }
 }
 
 function ensureDailyContent(){
@@ -530,27 +591,31 @@ function syncMusicVolume(){
 }
 function startMusic(){
  if(!music||state.musicEnabled===false)return;
- if(musicStarting)return;
- syncMusicVolume();
  try{
-  if(!music.getAttribute('src')&&!music.src)music.src='./audio/AventuraPesquera.mp3';
-  if(!music.paused&&!music.ended){musicReady=true;return}
+  syncMusicVolume();
+  if(!music.src||music.src==='')music.src='./audio/AventuraPesquera.mp3';
+  music.loop=true;
+  if(!music.paused){musicReady=true;musicStarting=false;return}
   musicStarting=true;
-  const attempt=music.play();
-  if(attempt&&typeof attempt.then==='function'){
-   attempt.then(()=>{musicReady=true;musicStarting=false;const n=$('music-status');if(n)n.textContent=''}).catch(()=>{musicStarting=false;const n=$('music-status');if(n)n.textContent='Música bloqueada: toca la pantalla o actívala en Ajustes.'});
+  const p=music.play();
+  if(p&&typeof p.then==='function'){
+   p.then(()=>{musicReady=true;musicStarting=false;const n=$('music-status');if(n)n.textContent=''}).catch(err=>{
+    musicStarting=false;
+    const n=$('music-status');if(n)n.textContent='Toca la pantalla para activar la música';
+   });
   } else {musicStarting=false;musicReady=true}
- }catch(e){musicStarting=false;const n=$('music-status');if(n)n.textContent='Música no disponible en este dispositivo.'}
+ }catch(e){musicStarting=false}
 }
 function stopMusic(){if(!music)return;try{music.pause()}catch(e){}}
 if(typeof document!=='undefined'){
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.musicEnabled!==false&&music&&music.paused)startMusic()});
+setInterval(()=>{if(state.musicEnabled!==false&&music&&music.paused&&musicReady&&!musicStarting&&document.visibilityState==='visible'){try{music.play().catch(()=>{})}catch(e){}}},4000);
 }
 function sound(type='click'){if(!state.sound||Number(state.effectsVolume)<=0)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const seq=type==='catch'?[520,680,850]:type==='catch1'?[480,620]:type==='catch2'?[520,700,880]:type==='catch3'?[400,600,900,1100]:type==='catch4'?[500,750,1000,1250]:type==='catch5'?[300,500,800,1200,1500]:type==='sell'?[560,780]:type==='cast'?[300,470]:type==='upgrade'?[430,620,790]:[430];seq.forEach((hz,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type==='cast'?'triangle':'sine';o.frequency.value=hz;const volume=.035*(Math.max(0,Math.min(100,Number(state.effectsVolume)||0))/100);g.gain.setValueAtTime(volume,audioCtx.currentTime+i*.09);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+i*.09+.12);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+i*.09);o.stop(audioCtx.currentTime+i*.09+.13)})}catch(e){}}
-function showScreen(name){if(sessionActive&&name!=='fishing'&&name!=='settings')return;activeScreen=name;screens.forEach(s=>$(s).classList.toggle('hidden',s!==name));window.scrollTo({top:0,behavior:'smooth'});if(name==='menu')renderMenu();if(name==='zones')renderZones();if(name==='upgrades')renderUpgrades();if(name==='encyclopedia')renderBook();if(name==='hold')renderHold();if(name==='settings')renderSettings();if(name==='boat')renderBoat();if(name==='treasures')renderTreasures();if(name==='aquarium')renderAquarium();if(name==='missions')renderMissions();if(name==='achievements')renderAchievements();if(name==='gacha')renderGacha();if(name==='stats')renderStats();if(name==='baits')renderBaitShop();renderTutorial();save()}
+function showScreen(name){if(sessionActive&&name!=='fishing'&&name!=='settings')return;activeScreen=name;screens.forEach(s=>$(s).classList.toggle('hidden',s!==name));window.scrollTo({top:0,behavior:'smooth'});if(name==='menu')renderMenu();if(name==='zones')renderZones();if(name==='upgrades')renderUpgrades();if(name==='encyclopedia')renderBook();if(name==='hold')renderHold();if(name==='settings')renderSettings();if(name==='rewards')renderRewards();if(name==='boat')renderBoat();if(name==='treasures')renderTreasures();if(name==='aquarium')renderAquarium();if(name==='missions')renderMissions();if(name==='achievements')renderAchievements();if(name==='gacha')renderGacha();if(name==='stats')renderStats();if(name==='baits')renderBaitShop();renderTutorial();save()}
 function openSettings(){if(activeScreen==='fishing'&&sessionActive){sessionActive=false;expeditionPausedForSettings=true;keys.left=false;keys.right=false;lastFrame=0}sound('click');showScreen('settings')}
 function returnFromSettings(){if(expeditionPausedForSettings){expeditionPausedForSettings=false;showScreen('fishing');sessionActive=true;lastFrame=0;startLoop();return}showScreen('menu')}
-function updateTop(){ $('money').textContent=cash(state.money);$('day').textContent='Día '+state.day;$('menu-day').textContent=state.day;$('encyclopedia-progress').textContent=state.discovered.length.toLocaleString('es-ES')+' / 1.200 descubiertos';$('hold-summary').textContent=state.hold.length+' peces almacenados';updateExpeditionHoldCounter()}
+function updateTop(){try{updateRewardsBadge()}catch(e){} $('money').textContent=cash(state.money);$('day').textContent='Día '+state.day;$('menu-day').textContent=state.day;$('encyclopedia-progress').textContent=state.discovered.length.toLocaleString('es-ES')+' / 1.200 descubiertos';$('hold-summary').textContent=state.hold.length+' peces almacenados';updateExpeditionHoldCounter()}
 function updateExpeditionHoldCounter(){const count=state.hold.length,cap=capacity();if($('expedition-hold-count'))$('expedition-hold-count').textContent=`${count} / ${cap}`;if($('expedition-hold-capacity'))$('expedition-hold-capacity').textContent=`${count} / ${cap}`;if($('expedition-hold-free'))$('expedition-hold-free').textContent=String(Math.max(0,cap-count))}
 function renderMenu(){updateTop();$('current-zone-title').textContent=currentZone().name;$('current-zone-desc').textContent=currentZone().desc;dailyWorld();const ng=$('go-night');if(ng){const nightUnlocked=(state.unlocked||[]).some(z=>z>=3);const used=(state.nightUsedDay||0)===state.day;if(!nightUnlocked){ng.disabled=true;ng.textContent='🌙 Nocturna (zona 4+)';}else{ng.disabled=used;ng.textContent=used?'🌙 Nocturna usada hoy':'🌙 Pesca nocturna';}}const ach=$('menu-achievements-count');if(ach)ach.textContent=`${(state.achievements||[]).length}/${ACHIEVEMENTS.length}`;renderTutorial();}
 function renderZones(){
@@ -1228,8 +1293,6 @@ function renderStats(){
  <p class="gacha-footnote">${pet?'Activa: '+pet.emoji+' '+pet.name:'Elige una mascota para obtener un buff pasivo.'}</p>
  <h3 class="section-title">📖 Bitácora semanal</h3>
  <ul class="logbook-list">${log}</ul>
- <h3 class="section-title">🎁 Código de regalo</h3>
- <div class="gift-row"><input id="gift-code-input" placeholder="Introduce tu código" maxlength="24" autocomplete="off" autocapitalize="characters"><button class="primary" id="gift-code-btn">Canjear</button></div>
  `;
 }
 
@@ -1393,7 +1456,7 @@ function selectZone(i){const z=zones[i];if(!z)return;if(!state.unlocked.includes
 // Sistemas adicionales: astillero, tesoros, acuario, contratos y torneo.
 $('boat-options').addEventListener('click',e=>{const b=e.target.closest('[data-boat]');if(b)buyBoat(Number(b.dataset.boat))});$('treasure-slots')?.addEventListener('click',e=>{const b=e.target.closest('[data-unequip-relic]');if(!b)return;state.equippedRelics=state.equippedRelics.filter(id=>String(id)!==String(b.dataset.unequipRelic));save();renderTreasures();sound('click')});$('treasure-encyclopedia-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-treasure-catalog]');if(b)openTreasureCatalogDetail(b.dataset.treasureCatalog)});function setTreasureView(view){treasureView=view==='encyclopedia'?'encyclopedia':'equipment';$('treasure-equipment-view').classList.toggle('hidden',treasureView!=='equipment');$('treasure-encyclopedia-view').classList.toggle('hidden',treasureView!=='encyclopedia');if(treasureView==='encyclopedia')renderTreasureEncyclopedia();sound('click')} $('open-treasure-encyclopedia').addEventListener('click',()=>setTreasureView('encyclopedia'));$('close-treasure-encyclopedia').addEventListener('click',()=>setTreasureView('equipment'));$('treasure-search').addEventListener('input',()=>{treasureBookPage=0;renderTreasureEncyclopedia()});$('treasure-rarity-filter').addEventListener('change',()=>{treasureBookPage=0;renderTreasureEncyclopedia()});$('treasure-prev-page').addEventListener('click',()=>{treasureBookPage--;renderTreasureEncyclopedia()});$('treasure-next-page').addEventListener('click',()=>{treasureBookPage++;renderTreasureEncyclopedia()});$('aquarium-prev-page').addEventListener('click',()=>{aquariumPage--;renderAquarium()});$('aquarium-next-page').addEventListener('click',()=>{aquariumPage++;renderAquarium()});$('treasure-list').addEventListener('click',e=>{const st=e.target.closest('[data-sell-treasure]');if(st){const id=st.dataset.sellTreasure,t=state.treasures.find(x=>String(x.id)===String(id));if(!t)return;state.treasures=state.treasures.filter(x=>String(x.id)!==String(id));state.equippedRelics=state.equippedRelics.filter(x=>String(x)!==String(id));state.money+=t.value;state.totalSales+=t.value;save();updateTop();renderTreasures();sound('sell');return}const eq=e.target.closest('[data-equip-relic]');if(eq){const id=String(eq.dataset.equipRelic),item=[...(state.relics||[]),...(state.treasures||[])].find(x=>String(x.id)===id);if(!item)return;if((state.equippedRelics||[]).some(x=>String(x)===id))return;if(state.equippedRelics.length>=boatRelicSlots()){toast('No tienes espacios de tesoros disponibles');return}if(!item.bonus){const template=treasureTypes.find(x=>x.name===item.name);if(template){item.bonus=template.bonus;item.passive=item.passive||template.passive}}state.equippedRelics.push(id);save();renderTreasures();sound('upgrade');toast(`Habilidad activada: ${item.name}`);return}const sell=e.target.closest('[data-sell-relic]');if(sell){const id=String(sell.dataset.sellRelic),r=state.relics.find(x=>String(x.id)===id);if(!r)return;state.relics=state.relics.filter(x=>String(x.id)!==id);state.equippedRelics=state.equippedRelics.filter(x=>String(x)!==id);state.money+=r.value;state.totalSales+=r.value;save();updateTop();renderTreasures();sound('sell');return}});$('sell-treasures').addEventListener('click',()=>{const ordinary=state.treasures||[],relics=state.relics||[],all=[...ordinary,...relics],total=all.reduce((n,t)=>n+(Number(t.value)||0),0),count=all.length;if(!count)return;state.treasures=[];state.relics=[];state.equippedRelics=[];state.money+=total;state.totalSales+=total;save();updateTop();renderTreasures();sound('sell');modal({icon:'💰',title:'Tesoros vendidos',desc:`Has vendido ${count} tesoros por ${cash(total)}.`,stats:[['Ingresos',cash(total)]],action:'Continuar'})});$('aquarium-list').addEventListener('click',e=>{const b=e.target.closest('[data-aquarium]');if(!b)return;const id=Number(b.dataset.aquarium);if(!state.discovered.includes(id)||!fish[id]||!aquariumRarityUnlocked(fish[id].rarity)||state.aquarium.includes(id)||state.aquarium.length>=aquariumCapacity())return;state.aquarium.push(id);save();renderAquarium();toast(`${fish[id].name} añadido a la pecera`)});$('aquarium-tank').addEventListener('click',e=>{const b=e.target.closest('[data-aquarium-info]');if(!b)return;const id=Number(b.dataset.aquariumInfo),f=fish[id];if(!f)return;modal({icon:f.emoji,title:f.name,eyebrow:rarities[f.rarity],desc:'Información del ejemplar expuesto en tu acuario.',stats:[['Rareza',rarities[f.rarity]],['Peso',f.weight+' kg'],['Valor de venta',cash(f.value)],['Ingresos diarios',cash(aquariumFishIncome(id))]],action:'Retirar del acuario',onAction:()=>{hideModal();state.aquarium=state.aquarium.filter(x=>x!==id);save();renderAquarium();toast(`${f.name} retirado de la pecera`)}})});$('aquarium-search').addEventListener('input',()=>{aquariumPage=0;renderAquarium()});$('mission-list').addEventListener('click',e=>{const b=e.target.closest('[data-mission]');if(b)claimMission(b.dataset.mission)});
 // Navigation and buttons
-$('begin').addEventListener('click',()=>{startMusic();state.hasStarted=true;save();sound('click');showScreen('menu')});$('brand-home').addEventListener('click',e=>{e.preventDefault();if(expeditionPausedForSettings){returnFromSettings();return}if(!sessionActive)showScreen(state.hasStarted?'menu':'intro')});$('settings-open').addEventListener('click',openSettings);$('leave-expedition').addEventListener('click',()=>{if(sessionActive)endFishing()});$('open-expedition-hold').addEventListener('click',openExpeditionHold);$('close-expedition-hold').addEventListener('click',closeExpeditionHold);$('go-fishing').addEventListener('click',startFishing);
+$('begin').addEventListener('click',()=>{startMusic();state.hasStarted=true;save();sound('click');showScreen('menu')});$('brand-home').addEventListener('click',e=>{e.preventDefault();if(expeditionPausedForSettings){returnFromSettings();return}if(!sessionActive)showScreen(state.hasStarted?'menu':'intro')});$('settings-open').addEventListener('click',openSettings);$('rewards-open')?.addEventListener('click',()=>{showScreen('rewards');renderRewards();sound('click')});$('leave-expedition').addEventListener('click',()=>{if(sessionActive)endFishing()});$('open-expedition-hold').addEventListener('click',openExpeditionHold);$('close-expedition-hold').addEventListener('click',closeExpeditionHold);$('go-fishing').addEventListener('click',startFishing);
 document.querySelectorAll('[data-mission-tab]').forEach(btn=>btn.addEventListener('click',()=>{setMissionTab(btn.dataset.missionTab);sound('click')}));
 document.querySelectorAll('[data-screen]').forEach(b=>b.addEventListener('click',()=>{sound('click');showScreen(b.dataset.screen)}));document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>{sound('click');if(activeScreen==='settings')returnFromSettings();else showScreen('menu')}));$('zone-grid').addEventListener('click',e=>{const b=e.target.closest('[data-zone]');if(b){selectZone(Number(b.dataset.zone));renderZones()}});$('upgrade-grid').addEventListener('click',e=>{const rs=e.target.closest('[data-relic-storage-upgrade]');if(rs){openTreasureUpgradeDetail(Number(rs.dataset.relicStorageUpgrade));return}const aq=e.target.closest('[data-aquarium-upgrade]');if(aq){openAquariumUpgradeDetail(Number(aq.dataset.aquariumUpgrade));return}const wh=e.target.closest('[data-warehouse-upgrade]');if(wh){openWarehouseUpgradeDetail(Number(wh.dataset.warehouseUpgrade));return}const tab=e.target.closest('[data-branch]');if(tab){selectedSkillBranch=tab.dataset.branch;renderUpgrades();sound('click');return}const b=e.target.closest('[data-skill]');if(b)openSkillDetail(b.dataset.skill)});$('hold-list').addEventListener('click',e=>{const store=e.target.closest('[data-store]');if(store){storeToWarehouse(Number(store.dataset.store));return}const b=e.target.closest('[data-sell]');if(b)sellIndex(Number(b.dataset.sell))});$('warehouse-list')?.addEventListener('click',e=>{const u=e.target.closest('[data-unstore]');if(u){unstoreFromWarehouse(Number(u.dataset.unstore));return}const s=e.target.closest('[data-sell-warehouse]');if(s)sellWarehouseIndex(Number(s.dataset.sellWarehouse))});$('sell-all').addEventListener('click',sellAll);$('daily-mission-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-daily]');if(b)claimDailyMission(b.dataset.daily)});$('contract-list')?.addEventListener('click',e=>{const b=e.target.closest('[data-deliver]');if(b)deliverContract(b.dataset.deliver)});$('story-mission-list')?.addEventListener('click',e=>{const w=e.target.closest('[data-weekly]');if(w){claimWeeklyMission(w.dataset.weekly);return}const b=e.target.closest('[data-story]');if(b)claimStoryMission(b.dataset.story)});$('fish-search').addEventListener('input',()=>{bookPage=0;renderBook()});
 $('fish-grid')?.addEventListener('click',e=>{
@@ -1419,8 +1482,8 @@ document.body.addEventListener('click',e=>{
 document.querySelector('.weather-badge')?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openWeatherInfo()}});
 setInterval(()=>{if(!state.stats)state.stats={};if(state.hasStarted)state.stats.playSeconds=(state.stats.playSeconds||0)+1},1000);
 
-normalizeTreasureAbilities();updateTop();if(state.hasStarted)showScreen('menu');else showScreen('intro');renderZones();renderUpgrades();renderBook();renderHold();renderSettings();renderBoat();renderTreasures();renderAquarium();ensureDailyContent();ensureWeeklyContent();renderMissions();dailyWorld();checkAchievements();maybeDailyLogin();renderAchievements();startMusic();if(state.hasStarted&&!state.tutorialDone)renderTutorial();document.addEventListener('pointerdown',startMusic,{once:true});
+normalizeTreasureAbilities();updateTop();if(state.hasStarted)showScreen('menu');else showScreen('intro');renderZones();renderUpgrades();renderBook();renderHold();renderSettings();renderBoat();renderTreasures();renderAquarium();ensureDailyContent();ensureWeeklyContent();renderMissions();dailyWorld();checkAchievements();maybeDailyLogin();updateRewardsBadge();renderAchievements();startMusic();if(state.hasStarted&&!state.tutorialDone)renderTutorial();document.addEventListener('pointerdown',()=>{startMusic()}, {passive:true});
 // mobile: silenciar highlight residual
 document.addEventListener('touchend',e=>{const t=e.target.closest('button,a,.dash-card,.zone-card,.mission-tab,.toggle');if(t)t.blur&&t.blur()},{passive:true});document.addEventListener('keydown',startMusic,{once:true});
-setInterval(()=>{if(activeScreen==='missions'){const el=$('daily-countdown');if(el)el.textContent=formatCountdown(msUntilMidnight());const lab=$('daily-reset-label');if(lab)lab.textContent='Reinicio a las 00:00 · queda '+formatCountdown(msUntilMidnight());ensureDailyContent()}},1000);
+setInterval(()=>{if(activeScreen==='rewards'){const el=$('rewards-countdown');if(el)el.textContent=formatCountdown(msUntilNextLogin());updateRewardsBadge()}if(activeScreen==='missions'){const el=$('daily-countdown');if(el)el.textContent=formatCountdown(msUntilMidnight());const lab=$('daily-reset-label');if(lab)lab.textContent='Reinicio a las 00:00 · queda '+formatCountdown(msUntilMidnight());ensureDailyContent()}},1000);
 })();
