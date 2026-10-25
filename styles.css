@@ -374,3 +374,7 @@ kbd{background:#123;border:1px solid #456;border-radius:4px;padding:0 .35rem}
 .rewards-feedback-card .rf-icon{font-size:1.8rem}
 .rewards-feedback-card ul{list-style:none;margin:10px 0 0;padding:0}
 .rewards-feedback-card li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1e3344}
+
+.rewards-feedback-card.ok{border-color:#34d39988;background:#0a2a22}
+.rewards-feedback-card.err{border-color:#f8717188;background:#2a1218}
+.reward-claimed-flash{border-color:#34d39966;box-shadow:0 0 20px #34d39933}
