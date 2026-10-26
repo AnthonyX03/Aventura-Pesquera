@@ -378,3 +378,8 @@ kbd{background:#123;border:1px solid #456;border-radius:4px;padding:0 .35rem}
 .rewards-feedback-card.ok{border-color:#34d39988;background:#0a2a22}
 .rewards-feedback-card.err{border-color:#f8717188;background:#2a1218}
 .reward-claimed-flash{border-color:#34d39966;box-shadow:0 0 20px #34d39933}
+
+.gift-code-name{margin:.4rem 0;font-size:.9rem;color:var(--muted)}
+.gift-used{margin-top:12px;font-size:.85rem}
+.gift-used.muted{color:var(--muted)}
+.gift-used strong{color:#5eead4}
