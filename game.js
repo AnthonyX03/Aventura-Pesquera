@@ -260,6 +260,23 @@ function tryGiftCode(code){
  return true;
 }
 
+
+function todayKey(){
+ const d=new Date();
+ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function msUntilMidnight(){
+ const n=new Date(),x=new Date(n);
+ x.setHours(24,0,0,0);
+ return Math.max(0,x-n);
+}
+function msUntilNextLogin(){return msUntilMidnight()}
+function formatCountdown(ms){
+ const s=Math.max(0,Math.floor(Number(ms)/1000));
+ const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
+ return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+}
+
 function dailyRewardAvailable(){return String(state.loginDate||'')!==String(todayKey())}
 
 function previewDailyReward(){
@@ -462,7 +479,7 @@ function fishValueMultiplier(f){let mult=1+SKILLS.filter(n=>n.branch==='storage'
 function currentZone(){return zones[state.zone]}
 function discoveredSet(){return new Set(state.discovered)}
 function price(f){const w=currentWeather(),s=currentSeason(),ev=activeEvent();let mul=(1+(state.rod-1)*.025)*fishValueMultiplier(f)*(1+relicBonus('sale')+petBonus('sale'))*(1+zoneMasteryBonus(state.zone||0))*(w.priceMul||1)*(s.priceMul||1)*(ev&&ev.priceMul||1);let v=f.value*mul;const mz=Math.max(f.minZone||0,0);const gap=Math.max(0,mz-state.zone);if(gap>0)v*=Math.pow(0.5,gap);const r=f.rarity||0;const z=state.zone||0;if(z<=0){if(r>=4)v*=0.22;else if(r>=3)v*=0.32;else if(r>=2)v*=0.48;else if(r>=1)v*=0.72}else if(z===1){if(r>=4)v*=0.35;else if(r>=3)v*=0.5;else if(r>=2)v*=0.7}else if(z===2){if(r>=4)v*=0.55;else if(r>=3)v*=0.75}else if(z===3){if(r>=5)v*=0.7;else if(r>=4)v*=0.85}return Math.max(1,Math.round(v))}
-let musicReady=false,musicStarting=false;
+let music=document.getElementById('background-music');let musicReady=false,musicStarting=false;
 function syncMusicVolume(){
  if(!music)return;
  const enabled=state.musicEnabled!==false;
