@@ -455,6 +455,9 @@ function claimDailyReward(){
   try{updateTop()}catch(e){}
   try{renderGacha()}catch(e){}
   renderRewardsPanel();
+  // Forzar cronómetro visible al instante
+  const el=$('rewards-countdown');
+  if(el) el.textContent=formatCountdown(msUntilNextLogin());
   try{toast('Recompensa diaria reclamada')}catch(e){}
   return true;
  }catch(err){
@@ -1227,29 +1230,41 @@ function executeGacha(type){
   state.treasures.push(result);
  }
  state.stats=state.stats||{};state.stats.gachaOpens=(state.stats.gachaOpens||0)+1;
- trackWeekly('gachaOpens',1);
- save();playGachaAnim(result,type);renderGacha();renderHold();renderTreasures();updateTop();checkAchievements();
+ try{trackWeekly('gachaOpens',1)}catch(e){}
+ try{save()}catch(e){}
+ try{playGachaAnim(result,type)}catch(e){console.warn(e)}
+ try{renderGacha()}catch(e){}
+ try{renderHold()}catch(e){}
+ try{renderTreasures()}catch(e){}
+ try{renderBook()}catch(e){}
+ try{updateTop()}catch(e){}
+ try{checkAchievements()}catch(e){}
+ const where = (type==='treasure') ? 'tesoros' : 'almacén';
+ try{toast((result&&result.emoji?result.emoji+' ':'')+(result&&result.name||'Premio')+' → '+where)}catch(e){}
 }
+
 function playGachaAnim(f,type){
  const el=$('gacha-anim');if(!el)return;
- const r=f.rarity||0;
- const rName=rarities[r]||'Común';
+ const r=(f&&f.rarity)||0;
+ const rName=(typeof rarities!=='undefined'&&rarities[r])||'Común';
  el.classList.remove('hidden','gacha-r0','gacha-r1','gacha-r2','gacha-r3','gacha-r4','gacha-r5');
  el.classList.add('gacha-spin','gacha-r'+Math.min(5,r));
- $('gacha-anim-emoji').textContent='❓';
- $('gacha-anim-name').textContent='Girando…';
- const sub=$('gacha-anim-rarity');if(sub)sub.textContent='';
+ const em=$('gacha-anim-emoji'); if(em) em.textContent='❓';
+ const nm=$('gacha-anim-name'); if(nm) nm.textContent='Girando…';
+ const sub=$('gacha-anim-rarity'); if(sub) sub.textContent='';
  setTimeout(()=>{
-  $('gacha-anim-emoji').textContent=f.emoji||'🎁';
-  $('gacha-anim-name').textContent=f.name;
-  if(sub)sub.textContent=rName+(f._treasure?' · Tesoro':(f.event?' · Evento':''));
-  el.classList.remove('gacha-spin');el.classList.add('gacha-reveal');
-  sound(r>=4?'upgrade':r>=2?'catch':'sell');
-  setTimeout(()=>{el.classList.add('hidden');el.classList.remove('gacha-reveal','gacha-r0','gacha-r1','gacha-r2','gacha-r3','gacha-r4','gacha-r5');
-   toast(`${f.emoji||'🎁'} ${f.name} (${rName})`);
-  },1600);
- },1100);
+  if(em) em.textContent=(f&&f.emoji)||'🎁';
+  if(nm) nm.textContent=(f&&f.name)||'Premio';
+  if(sub) sub.textContent=rName+(f&&f._treasure?' · Tesoro':(f&&f.event?' · Evento':''));
+  el.classList.remove('gacha-spin'); el.classList.add('gacha-reveal');
+  try{sound(r>=4?'upgrade':r>=2?'catch':'sell')}catch(e){}
+  setTimeout(()=>{
+   el.classList.add('hidden');
+   el.classList.remove('gacha-reveal','gacha-r0','gacha-r1','gacha-r2','gacha-r3','gacha-r4','gacha-r5');
+  },1800);
+ },900);
 }
+
 function renderGacha(){
  ensureEventZones();
  const root=$('gacha-list');if(!root)return;
@@ -1575,5 +1590,10 @@ setInterval(()=>{if(!state.stats)state.stats={};if(state.hasStarted)state.stats.
 normalizeTreasureAbilities();updateTop();if(state.hasStarted)showScreen('menu');else showScreen('intro');renderZones();renderUpgrades();renderBook();renderHold();renderSettings();renderBoat();renderTreasures();renderAquarium();ensureDailyContent();ensureWeeklyContent();renderMissions();dailyWorld();checkAchievements();maybeDailyLogin();renderAchievements();startMusic();state.tutorialDone=true;document.addEventListener('pointerdown',startMusic,{once:true});
 // mobile: silenciar highlight residual
 document.addEventListener('touchend',e=>{const t=e.target.closest('button,a,.dash-card,.zone-card,.mission-tab,.toggle');if(t)t.blur&&t.blur()},{passive:true});document.addEventListener('keydown',startMusic,{once:true});
-setInterval(()=>{if(activeScreen==='rewards'){const el=$('rewards-countdown');if(el)el.textContent=formatCountdown(msUntilNextLogin());updateRewardsBadge()}if(activeScreen==='missions'){const el=$('daily-countdown');if(el)el.textContent=formatCountdown(msUntilMidnight());const lab=$('daily-reset-label');if(lab)lab.textContent='Reinicio a las 00:00 · queda '+formatCountdown(msUntilMidnight());ensureDailyContent()}},1000);
+setInterval(()=>{
+ // Cronómetro recompensas: siempre que el elemento exista (tiempo real)
+ const rcd=$('rewards-countdown');
+ if(rcd){try{rcd.textContent=formatCountdown(msUntilNextLogin())}catch(e){}}
+ try{updateRewardsBadge()}catch(e){}
+ if(activeScreen==='missions'){const el=$('daily-countdown');if(el)el.textContent=formatCountdown(msUntilMidnight());const lab=$('daily-reset-label');if(lab)lab.textContent='Reinicio a las 00:00 · queda '+formatCountdown(msUntilMidnight());ensureDailyContent()}},1000);
 })();
