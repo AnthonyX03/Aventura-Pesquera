@@ -451,11 +451,11 @@ function claimDailyReward(){
   window._lastDailyClaim={day:prev.day, list:prev.list.slice(), money:prev.money};
   window._rewardsFlash='daily';
   window._giftFeedback=null;
-  save();
-  updateTop();
+  try{save()}catch(e){}
+  try{updateTop()}catch(e){}
   try{renderGacha()}catch(e){}
   renderRewardsPanel();
-  toast('Recompensa diaria reclamada');
+  try{toast('Recompensa diaria reclamada')}catch(e){}
   return true;
  }catch(err){
   console.error(err);
@@ -502,9 +502,6 @@ function tryGiftCode(raw){
    stats.push(['Dinero', cash(g.money)]);
   }
   state.giftCodes.push(code);
-  save();
-  updateTop();
-  try{renderGacha()}catch(e){}
   window._giftFeedback={
    ok:true,
    icon:'🎁',
@@ -513,8 +510,11 @@ function tryGiftCode(raw){
    stats:stats,
    code:code
   };
+  try{save()}catch(e){}
+  try{updateTop()}catch(e){}
+  try{renderGacha()}catch(e){}
   renderRewardsPanel();
-  toast('Código '+code+' canjeado');
+  try{toast('Código '+code+' canjeado')}catch(e){}
   return true;
  }catch(err){
   console.error('tryGiftCode', err);
@@ -666,7 +666,18 @@ function sound(type='click'){if(!state.sound||Number(state.effectsVolume)<=0)ret
 function showScreen(name){if(sessionActive&&name!=='fishing'&&name!=='settings')return;activeScreen=name;screens.forEach(s=>$(s).classList.toggle('hidden',s!==name));window.scrollTo({top:0,behavior:'smooth'});if(name==='menu')renderMenu();if(name==='zones')renderZones();if(name==='upgrades')renderUpgrades();if(name==='encyclopedia')renderBook();if(name==='hold')renderHold();if(name==='settings')renderSettings();if(name==='rewards'){window._rewardsFlash=window._rewardsFlash||null;renderRewards({clearGift:true});}if(name==='boat')renderBoat();if(name==='treasures')renderTreasures();if(name==='aquarium')renderAquarium();if(name==='missions')renderMissions();if(name==='achievements')renderAchievements();if(name==='gacha')renderGacha();if(name==='stats')renderStats();if(name==='baits')renderBaitShop();renderTutorial();save()}
 function openSettings(){if(activeScreen==='fishing'&&sessionActive){sessionActive=false;expeditionPausedForSettings=true;keys.left=false;keys.right=false;lastFrame=0}sound('click');showScreen('settings')}
 function returnFromSettings(){if(expeditionPausedForSettings){expeditionPausedForSettings=false;showScreen('fishing');sessionActive=true;lastFrame=0;startLoop();return}showScreen('menu')}
-function updateTop(){try{updateRewardsBadge()}catch(e){} $('money').textContent=cash(state.money);$('day').textContent='Día '+state.day;$('menu-day').textContent=state.day;$('encyclopedia-progress').textContent=state.discovered.length.toLocaleString('es-ES')+' / 1.200 descubiertos';$('hold-summary').textContent=state.hold.length+' peces almacenados';updateExpeditionHoldCounter()}
+function updateTop(){
+ try{updateRewardsBadge()}catch(e){}
+ const setText=(id,val)=>{const el=$(id);if(el)el.textContent=val};
+ setText('money', cash(state.money));
+ setText('day', 'Día '+state.day);
+ setText('menu-day', String(state.day));
+ setText('encyclopedia-progress', (state.discovered||[]).length.toLocaleString('es-ES')+' / 1.200 descubiertos');
+ setText('hold-summary', (state.hold||[]).length+' peces almacenados');
+ setText('menu-book-count', (state.discovered||[]).length+' especies');
+ try{updateExpeditionHoldCounter()}catch(e){}
+}
+
 function updateExpeditionHoldCounter(){const count=state.hold.length,cap=capacity();if($('expedition-hold-count'))$('expedition-hold-count').textContent=`${count} / ${cap}`;if($('expedition-hold-capacity'))$('expedition-hold-capacity').textContent=`${count} / ${cap}`;if($('expedition-hold-free'))$('expedition-hold-free').textContent=String(Math.max(0,cap-count))}
 function renderMenu(){updateTop();$('current-zone-title').textContent=currentZone().name;$('current-zone-desc').textContent=currentZone().desc;dailyWorld();const ng=$('go-night');if(ng){const nightUnlocked=(state.unlocked||[]).some(z=>z>=3);const used=(state.nightUsedDay||0)===state.day;if(!nightUnlocked){ng.disabled=true;ng.textContent='🌙 Nocturna (zona 4+)';}else{ng.disabled=used;ng.textContent=used?'🌙 Nocturna usada hoy':'🌙 Pesca nocturna';}}const ach=$('menu-achievements-count');if(ach)ach.textContent=`${(state.achievements||[]).length}/${ACHIEVEMENTS.length}`;renderTutorial();}
 function renderZones(){
